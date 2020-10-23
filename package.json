@@ -1,0 +1,19 @@
+{
+  "name": "cgen-links",
+  "version": "1.0.0",
+  "description": "CGEN Links",
+  "author": "Tyler Candee",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "bootstrap": "yarn install && lerna bootstrap",
+    "build": "bash ./build.sh",
+    "build:client": "cd client && yarn build",
+    "start": "cd server && yarn start"
+  },
+  "devDependencies": {
+    "lerna": "^3.22.1",
+    "prettier": "^1.19.1",
+    "rimraf": "^3.0.2"
+  }
+}

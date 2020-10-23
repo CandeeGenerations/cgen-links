@@ -1,0 +1,35 @@
+type ShortUrl {
+  fullUrl: String!
+  shortCode: String
+  addedTs: String!
+}
+
+type Click {
+  urlId: ID!
+  clickedTs: String!
+  ipAddress: String
+  language: String
+  userAgent: String
+  country: String
+  region: String
+  city: String
+}
+
+type User {
+  googleId: String!
+  email: String!
+  firstName: String!
+  lastName: String!
+  authorized: Boolean!
+}
+
+type Query {
+  findAllShortUrls: [ShortUrl]!
+  findShortUrl(shortCode: String!): ShortUrl
+
+  findAllClicks: [Click]!
+  findAllClicksByShortUrl(urlId: ID!): [Click]!
+
+  findUserByGoogleId(googleId: String!): User
+  findAuthorizedUser(googleId: String!, authorized: Boolean!): User
+}
