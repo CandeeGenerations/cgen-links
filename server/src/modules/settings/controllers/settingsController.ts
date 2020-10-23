@@ -13,10 +13,9 @@ export class SettingsController {
   }
 
   @Post()
-  createSettings(
-    @Body('settings') settings: SettingsInput,
-  ): Promise<SettingsModel> {
-    return this.settingsService.createSettings(settings)
+  createSettings(@Body() input: SettingsInput): Promise<SettingsModel> {
+    console.log(input)
+    return this.settingsService.createSettings(input)
   }
 
   @Put(':id')

@@ -16,24 +16,16 @@ type Click {
   city: String
 }
 
-type Colors {
-  primary: String
-  secondary: String
-}
-
-type SocialLinks {
-  facebook: String
-  instagram: String
-  twitter: String
-  youtube: String
-}
-
 type Settings {
   userId: ID!
   slug: String!
   logoUrl: String
-  colors: Colors
-  socialLinks: SocialLinks
+  primaryColor: String
+  secondaryColor: String
+  facebook: String
+  instagram: String
+  twitter: String
+  youtube: String
 }
 
 type User {

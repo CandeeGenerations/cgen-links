@@ -24,24 +24,16 @@ export class Click {
     city?: string;
 }
 
-export class Colors {
-    primary?: string;
-    secondary?: string;
-}
-
-export class SocialLinks {
-    facebook?: string;
-    instagram?: string;
-    twitter?: string;
-    youtube?: string;
-}
-
 export class Settings {
     userId: string;
     slug: string;
     logoUrl?: string;
-    colors?: Colors;
-    socialLinks?: SocialLinks;
+    primaryColor?: string;
+    secondaryColor?: string;
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+    youtube?: string;
 }
 
 export class User {
@@ -56,6 +48,8 @@ export abstract class IQuery {
     abstract findAllLinks(): Link[] | Promise<Link[]>;
 
     abstract findLinkByTitle(title: string): Link | Promise<Link>;
+
+    abstract findLinkByDestination(destination: string): Link | Promise<Link>;
 
     abstract findAllClicks(): Click[] | Promise<Click[]>;
 

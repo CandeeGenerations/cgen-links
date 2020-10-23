@@ -1,11 +1,4 @@
-import {
-  Click,
-  Link,
-  User,
-  Settings,
-  Colors,
-  SocialLinks,
-} from './graphql.schema'
+import {Click, Link, User, Settings} from './graphql.schema'
 
 export interface ConfigModel {
   routingUrl: string
@@ -18,23 +11,16 @@ export interface LinkInput {
   description?: string
 }
 
-export interface ColorsInput {
-  primary?: string
-  secondary?: string
-}
-
-export interface SocialLinksInput {
+export interface SettingsInput {
+  userId: string
+  slug: string
+  logoUrl?: string
+  primaryColor?: string
+  secondaryColor?: string
   facebook?: string
   instagram?: string
   twitter?: string
   youtube?: string
-}
-
-export interface SettingsInput {
-  slug: string
-  logoUrl?: string
-  colors?: ColorsInput
-  socialLinks?: SocialLinksInput
 }
 
 export interface LinkModel extends Link {

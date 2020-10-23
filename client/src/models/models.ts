@@ -1,5 +1,3 @@
-import {Settings} from 'http2'
-
 export interface ConfigModel {
   routingUrl: string
   gClientId: string
@@ -11,23 +9,16 @@ export interface LinkInput {
   description?: string
 }
 
-export interface ColorsInput {
-  primary?: string
-  secondary?: string
-}
-
-export interface SocialLinksInput {
+export interface SettingsInput {
+  userId: string
+  slug: string
+  logoUrl?: string
+  primaryColor?: string
+  secondaryColor?: string
   facebook?: string
   instagram?: string
   twitter?: string
   youtube?: string
-}
-
-export interface SettingsInput {
-  slug: string
-  logoUrl?: string
-  colors?: ColorsInput
-  socialLinks?: SocialLinksInput
 }
 
 export interface Link extends LinkInput {
@@ -55,13 +46,18 @@ export interface ClickModel extends Click {
   _ts: string
 }
 
-export interface SettingsModel extends Settings {
+export interface SettingsModel extends SettingsInput {
+  _id: string
+  _ts: string
+}
+
+export interface UserModel extends User {
   _id: string
   _ts: string
 }
 
 export interface ErrorModel {
-  error: string
+  error?: string
   message: string
   statusCode: number
 }

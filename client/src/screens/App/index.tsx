@@ -16,6 +16,7 @@ import Home from '../Home'
 import Links from '../Links'
 import NewLink from '../NewLink'
 import Link from '../Links/Link'
+import Settings from '../Settings'
 import {getConfig} from '../../api'
 import {authTokenKey} from '../../helpers'
 import {ConfigModel} from '../../models/models'
@@ -65,7 +66,11 @@ const App = () => {
                   <RLink to="/links">Links</RLink>
                 </Menu.Item>
 
-                <Menu.Item key="3" style={{float: 'right'}}>
+                <Menu.Item key="3">
+                  <RLink to="/settings">Settings</RLink>
+                </Menu.Item>
+
+                <Menu.Item key="4" style={{float: 'right'}}>
                   <ALink onClick={onLogOut}>Log Out</ALink>
                 </Menu.Item>
               </Menu>
@@ -111,6 +116,22 @@ const App = () => {
                 render={({location}) =>
                   loggedIn ? (
                     <NewLink />
+                  ) : (
+                    <Redirect
+                      to={{
+                        pathname: '/',
+                        state: {from: location},
+                      }}
+                    />
+                  )
+                }
+              />
+
+              <Route
+                path="/settings"
+                render={({location}) =>
+                  loggedIn ? (
+                    <Settings />
                   ) : (
                     <Redirect
                       to={{

@@ -2,48 +2,52 @@ import React, {useContext, useEffect, useState} from 'react'
 
 import Space from 'antd/es/space'
 import {Link} from 'react-router-dom'
+import Tooltip from 'antd/es/tooltip'
 import Skeleton from 'antd/es/skeleton'
 import Text from 'antd/es/typography/Text'
 import Breadcrumb from 'antd/es/breadcrumb'
 import Table, {ColumnsType} from 'antd/es/table'
 
 import {ConfigContext} from '../App'
+import {findAllLinks} from '../../api'
 import {formatDate} from '../../helpers'
 import Title from '../../components/Title'
-import {findAllLinks} from '../../api'
-import Container from '../../components/Container'
 import {LinkModel} from '../../models/models'
+import Container from '../../components/Container'
 
-const ShortCodes = () => {
+const Links = () => {
   const configContext = useContext(ConfigContext)
   const [loading, setLoading] = useState(true)
-  const [allShortUrls, setAllShortUrls] = useState<LinkModel[]>([])
+  const [allLinks, setAllLinks] = useState<LinkModel[]>([])
 
   const columns: ColumnsType<LinkModel> = [
     {
-      title: 'Short Code',
-      dataIndex: 'shortCode',
-      key: 'shortCode',
-      render: (code: string) => (
-        <Text
-          code
-          copyable={{
-            text: `${configContext?.routingUrl || ''}/${code}`,
-          }}
-        >
-          {code}
-        </Text>
-      ),
+      title: 'Title',
+      dataIndex: 'title',
+      key: 'title',
     },
     {
-      title: 'Full URL',
-      dataIndex: 'fullUrl',
-      key: 'fullUrl',
+      title: 'Destination',
+      dataIndex: 'destination',
+      key: 'destination',
       responsive: ['xl'],
       render: (url: string) => (
         <Text code copyable>
           {url}
         </Text>
+      ),
+    },
+    {
+      title: 'Description',
+      key: 'description',
+      dataIndex: 'description',
+      ellipsis: {
+        showTitle: false,
+      },
+      render: (description: string) => (
+        <Tooltip placement="topLeft" title={description}>
+          {description}
+        </Tooltip>
       ),
     },
     {
@@ -65,21 +69,21 @@ const ShortCodes = () => {
       key: 'action',
       render: (text: string, record: LinkModel) => (
         <Space size="middle">
-          <Link to={`/codes/${record._id}`}>View Details</Link>
+          <Link to={`/links/${record._id}`}>View Details</Link>
         </Space>
       ),
     },
   ]
 
-  const getShortUrls = async () => {
+  const getLinks = async () => {
     const response = await findAllLinks()
 
-    setAllShortUrls(response)
+    setAllLinks(response)
     setLoading(false)
   }
 
   useEffect(() => {
-    getShortUrls()
+    getLinks()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
@@ -90,21 +94,21 @@ const ShortCodes = () => {
             <Link to="/new">Home</Link>
           </Breadcrumb.Item>
 
-          <Breadcrumb.Item>Short URLs</Breadcrumb.Item>
+          <Breadcrumb.Item>Links</Breadcrumb.Item>
         </Breadcrumb>
       </Container>
 
       <Container span={20}>
-        <Title>Short URLs</Title>
+        <Title>Links</Title>
 
         {loading ? (
           <Skeleton active />
         ) : (
-          <Table dataSource={allShortUrls} columns={columns} />
+          <Table dataSource={allLinks} columns={columns} />
         )}
       </Container>
     </>
   )
 }
 
-export default ShortCodes
+export default Links

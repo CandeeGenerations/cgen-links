@@ -185,60 +185,48 @@ export const FIND_SETTINGS_BY_USER_ID = gql`
       userId
       slug
       logoUrl
-      colors {
-        primary
-        secondary
-      }
-      socialLinks {
-        facebook
-        instagram
-        twitter
-        youtube
-      }
+      primaryColor
+      secondaryColor
+      facebook
+      instagram
+      twitter
+      youtube
     }
   }
 `
 
 export const CREATE_SETTINGS = gql`
-  query CreateSettings($input: SettingsInput!) {
+  mutation CreateSettings($input: SettingsInput!) {
     createSettings(data: $input) {
       _id
       _ts
       userId
       slug
       logoUrl
-      colors {
-        primary
-        secondary
-      }
-      socialLinks {
-        facebook
-        instagram
-        twitter
-        youtube
-      }
+      primaryColor
+      secondaryColor
+      facebook
+      instagram
+      twitter
+      youtube
     }
   }
 `
 
 export const UPDATE_SETTINGS = gql`
-  query UpdateSettings($id: ID!, $input: SettingsInput!) {
+  mutation UpdateSettings($id: ID!, $input: SettingsInput!) {
     updateSettings(id: $id, data: $input) {
       _id
       _ts
       userId
       slug
       logoUrl
-      colors {
-        primary
-        secondary
-      }
-      socialLinks {
-        facebook
-        instagram
-        twitter
-        youtube
-      }
+      primaryColor
+      secondaryColor
+      facebook
+      instagram
+      twitter
+      youtube
     }
   }
 `

@@ -54,8 +54,9 @@ const put = async <T>({url, data, ...config}: AxiosRequestConfig) =>
 
 const handleErrors = <T>(response: ErrorModel | AxiosResponse<T>) => {
   const error = response as ErrorModel
+  const acceptableErrors = [400, 401, 500]
 
-  if (error && [400, 401].includes(error.statusCode)) {
+  if (error && acceptableErrors.includes(error.statusCode)) {
     throw new Error(error.message)
   }
 

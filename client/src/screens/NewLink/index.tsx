@@ -5,11 +5,10 @@ import Input from 'antd/es/input'
 import Button from 'antd/es/button'
 
 import {createLink} from '../../api'
+import {urlRegex} from '../../helpers'
 import Title from '../../components/Title'
 import {LinkInput} from '../../models/models'
 import Container from '../../components/Container'
-
-const urlRegex = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w\-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!/\\\w]*))?)/
 
 const NewLink = () => {
   const [form] = Form.useForm()
