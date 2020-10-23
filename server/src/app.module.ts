@@ -5,15 +5,16 @@ import {ServeStaticModule} from '@nestjs/serve-static'
 import {MiddlewareConsumer, Module, RequestMethod} from '@nestjs/common'
 
 import {logProviders, getLogger} from './logging'
+import {LinkModule} from './modules/link/link.module'
 import {AuthModule} from './modules/auth/auth.module'
 import {AuthMiddleware} from './auth/auth.middleware'
 import {enableDebugLogging} from './logging/constants'
 import {ClickModule} from './modules/click/click.module'
 import {AppController} from './controllers/app.controller'
 import {AuthService} from './modules/auth/services/auth.service'
-import {ShortUrlModule} from './modules/shortUrl/shortUrl.module'
+import {LinkService} from './modules/link/services/link.service'
+import {SettingsModule} from './modules/settings/settingsModule'
 import {ClickService} from './modules/click/services/click.service'
-import {ShortUrlService} from './modules/shortUrl/services/shortUrl.service'
 
 const {NODE_ENV} = process.env
 
@@ -36,12 +37,13 @@ const morganLogStream = {
     ConfigModule.forRoot(),
 
     // modules
-    ShortUrlModule,
+    LinkModule,
     ClickModule,
     AuthModule,
+    SettingsModule,
   ],
   controllers: [AppController],
-  providers: [ShortUrlService, ClickService, AuthService, ...logProviders],
+  providers: [LinkService, ClickService, AuthService, ...logProviders],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer): void {

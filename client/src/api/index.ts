@@ -1,14 +1,16 @@
-import axios, {AxiosRequestConfig, AxiosResponse} from 'axios'
 import {GoogleLoginResponse} from 'react-google-login'
+import axios, {AxiosRequestConfig, AxiosResponse} from 'axios'
 import {
   Click,
   ClickModel,
   ErrorModel,
-  ShortUrl,
-  ShortUrlInput,
-  ShortUrlModel,
+  Link,
+  LinkInput,
+  LinkModel,
   User,
   ConfigModel,
+  SettingsModel,
+  SettingsInput,
 } from '../models/models'
 
 const apiUrl = process.env.REACT_APP_API_URL || '/api'
@@ -66,40 +68,30 @@ export const getConfig = async (): Promise<ConfigModel> => {
   return handleErrors(response)
 }
 
-export const findAllShortUrls = async (): Promise<ShortUrlModel[]> => {
-  const response = await get<ShortUrlModel[]>({url: 'short'})
+export const findAllLinks = async (): Promise<LinkModel[]> => {
+  const response = await get<LinkModel[]>({url: 'link'})
 
   return handleErrors(response)
 }
 
-export const findShortUrl = async (
-  shortCode: string,
-): Promise<ShortUrlModel> => {
-  const response = await get<ShortUrlModel>({url: `short/${shortCode}`})
+export const findLinkById = async (id: string): Promise<LinkModel> => {
+  const response = await get<LinkModel>({url: `link/id/${id}`})
 
   return handleErrors(response)
 }
 
-export const findShortUrlById = async (id: string): Promise<ShortUrlModel> => {
-  const response = await get<ShortUrlModel>({url: `short/id/${id}`})
+export const createLink = async (input: LinkInput): Promise<LinkModel> => {
+  const response = await post<LinkModel>({url: 'link', data: {...input}})
 
   return handleErrors(response)
 }
 
-export const createShortUrl = async (
-  input: ShortUrlInput,
-): Promise<ShortUrlModel> => {
-  const response = await post<ShortUrlModel>({url: 'short', data: {...input}})
-
-  return handleErrors(response)
-}
-
-export const updateShortUrl = async (
+export const updateLink = async (
   id: string,
-  input: ShortUrl,
-): Promise<ShortUrlModel> => {
-  const response = await put<ShortUrlModel>({
-    url: `short/${id}`,
+  input: Link,
+): Promise<LinkModel> => {
+  const response = await put<LinkModel>({
+    url: `link/${id}`,
     data: {...input},
   })
 
@@ -112,16 +104,47 @@ export const findAllClicks = async (): Promise<ClickModel[]> => {
   return handleErrors(response)
 }
 
-export const findAllClicksByShortUrl = async (
-  urlId: string,
+export const findAllClicksByLinkId = async (
+  linkId: string,
 ): Promise<ClickModel[]> => {
-  const response = await get<ClickModel[]>({url: `click/${urlId}`})
+  const response = await get<ClickModel[]>({url: `click/${linkId}`})
 
   return handleErrors(response)
 }
 
 export const createClick = async (input: Click): Promise<ClickModel> => {
   const response = await post<ClickModel>({url: 'click', data: {...input}})
+
+  return handleErrors(response)
+}
+
+export const findSettingsByUserId = async (
+  userId: string,
+): Promise<SettingsModel> => {
+  const response = await get<SettingsModel>({url: `settings/${userId}`})
+
+  return handleErrors(response)
+}
+
+export const createSettings = async (
+  input: SettingsInput,
+): Promise<SettingsModel> => {
+  const response = await post<SettingsModel>({
+    url: 'settings',
+    data: {...input},
+  })
+
+  return handleErrors(response)
+}
+
+export const updateSettings = async (
+  id: string,
+  input: SettingsInput,
+): Promise<SettingsModel> => {
+  const response = await put<SettingsModel>({
+    url: `settings/${id}`,
+    data: {...input},
+  })
 
   return handleErrors(response)
 }

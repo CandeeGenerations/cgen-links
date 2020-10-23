@@ -6,14 +6,14 @@ import Tooltip from 'antd/es/tooltip'
 import Skeleton from 'antd/es/skeleton'
 import Text from 'antd/es/typography/Text'
 import Breadcrumb from 'antd/es/breadcrumb'
-import {useParams, Link} from 'react-router-dom'
+import {useParams, Link as RLink} from 'react-router-dom'
 
 import {ConfigContext} from '../App'
 import {formatDate} from '../../helpers'
 import Title from '../../components/Title'
 import Container from '../../components/Container'
-import {ClickModel, ShortUrlModel} from '../../models/models'
-import {findAllClicksByShortUrl, findShortUrlById} from '../../api'
+import {ClickModel, LinkModel} from '../../models/models'
+import {findAllClicksByLinkId, findLinkById} from '../../api'
 
 const columns = [
   {
@@ -54,24 +54,24 @@ const columns = [
   },
 ]
 
-const ShortCode = () => {
+const Link = () => {
   const {id} = useParams<{id: string}>()
   const configContext = useContext(ConfigContext)
 
   const [clicks, setClicks] = useState<ClickModel[]>([])
   const [loadingClicks, setLoadingClicks] = useState(true)
-  const [loadingShortUrl, setLoadingShortUrl] = useState(true)
-  const [shortUrl, setShortUrl] = useState<ShortUrlModel | null>(null)
+  const [loadingLink, setLoadingLink] = useState(true)
+  const [link, setLink] = useState<LinkModel | null>(null)
 
   const getShortUrl = async () => {
-    const response = await findShortUrlById(id)
+    const response = await findLinkById(id)
 
-    setShortUrl(response)
-    setLoadingShortUrl(false)
+    setLink(response)
+    setLoadingLink(false)
   }
 
   const getClicks = async () => {
-    const response = await findAllClicksByShortUrl(id)
+    const response = await findAllClicksByLinkId(id)
 
     setClicks(response)
     setLoadingClicks(false)
@@ -87,55 +87,54 @@ const ShortCode = () => {
       <Container span={20} background={false}>
         <Breadcrumb style={{margin: '16px 0'}}>
           <Breadcrumb.Item>
-            <Link to="/new">Home</Link>
+            <RLink to="/new">Home</RLink>
           </Breadcrumb.Item>
 
           <Breadcrumb.Item>
-            <Link to="/codes">Short URLs</Link>
+            <RLink to="/links">Links</RLink>
           </Breadcrumb.Item>
 
-          <Breadcrumb.Item>
-            {loadingShortUrl ? '...' : shortUrl?.shortCode}
-          </Breadcrumb.Item>
+          <Breadcrumb.Item>{loadingLink ? '...' : link?.title}</Breadcrumb.Item>
         </Breadcrumb>
       </Container>
 
       <Container span={20}>
-        <Title>Short URL</Title>
+        <Title>Link</Title>
 
-        {loadingShortUrl || !shortUrl ? (
+        {loadingLink || !link ? (
           <Skeleton active />
         ) : (
-          <Row gutter={[16, {md: 16, sm: 24, xs: 24}]}>
-            <Col md={4} sm={24} xs={24}>
-              <strong>Short Code:</strong>
-              <br />
-              <Text
-                code
-                copyable={{
-                  text: `${configContext?.routingUrl || ''}/${
-                    shortUrl.shortCode
-                  }`,
-                }}
-              >
-                {shortUrl.shortCode}
-              </Text>
-            </Col>
+          <>
+            <Row gutter={[16, {md: 16, sm: 24, xs: 24}]}>
+              <Col md={4} sm={24} xs={24}>
+                <strong>Title:</strong>
+                <br />
+                <Text>{link.title}</Text>
+              </Col>
 
-            <Col md={12} sm={24} xs={24}>
-              <strong>Full URL:</strong>
-              <br />
-              <Text code copyable>
-                {shortUrl.fullUrl}
-              </Text>
-            </Col>
+              <Col md={12} sm={24} xs={24}>
+                <strong>Destination:</strong>
+                <br />
+                <Text code copyable>
+                  {link.destination}
+                </Text>
+              </Col>
 
-            <Col md={8} sm={24} xs={24}>
-              <strong>Date Added:</strong>
-              <br />
-              {formatDate(shortUrl.addedTs)}
-            </Col>
-          </Row>
+              <Col md={8} sm={24} xs={24}>
+                <strong>Date Added:</strong>
+                <br />
+                <Text>{formatDate(link.addedTs)}</Text>
+              </Col>
+            </Row>
+
+            <Row>
+              <Col span={24}>
+                <strong>Description:</strong>
+                <br />
+                <Text>{link.description}</Text>
+              </Col>
+            </Row>
+          </>
         )}
       </Container>
 
@@ -152,4 +151,4 @@ const ShortCode = () => {
   )
 }
 
-export default ShortCode
+export default Link

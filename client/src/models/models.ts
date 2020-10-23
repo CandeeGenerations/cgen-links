@@ -1,19 +1,41 @@
+import {Settings} from 'http2'
+
 export interface ConfigModel {
   routingUrl: string
   gClientId: string
 }
 
-export interface ShortUrlInput {
-  fullUrl: string
-  shortCode?: string
+export interface LinkInput {
+  title: string
+  destination: string
+  description?: string
 }
 
-export interface ShortUrl extends ShortUrlInput {
+export interface ColorsInput {
+  primary?: string
+  secondary?: string
+}
+
+export interface SocialLinksInput {
+  facebook?: string
+  instagram?: string
+  twitter?: string
+  youtube?: string
+}
+
+export interface SettingsInput {
+  slug: string
+  logoUrl?: string
+  colors?: ColorsInput
+  socialLinks?: SocialLinksInput
+}
+
+export interface Link extends LinkInput {
   addedTs: string
 }
 
 export interface Click {
-  urlId: string
+  linkId: string
   clickedTs: string
   ipAddress?: string
   language?: string
@@ -23,12 +45,17 @@ export interface Click {
   city?: string
 }
 
-export interface ShortUrlModel extends ShortUrl {
+export interface LinkModel extends Link {
   _id: string
   _ts: string
 }
 
 export interface ClickModel extends Click {
+  _id: string
+  _ts: string
+}
+
+export interface SettingsModel extends Settings {
   _id: string
   _ts: string
 }

@@ -6,12 +6,12 @@ import {getGQLClient} from 'src/api/graphqlRequest'
 import {
   CREATE_CLICK,
   FIND_ALL_CLICKS,
-  FIND_ALL_CLICKS_BY_SHORT_URL,
+  FIND_ALL_CLICKS_BY_LINK_ID
 } from 'src/models/gqlRequests'
 import {
   ClickModel,
   CreateClickModel,
-  FindAllClicksByShortUrlModel,
+  FindAllClicksByLinkIdModel,
   FindAllClicksModel,
 } from 'src/models/models'
 
@@ -31,13 +31,13 @@ export class ClickService {
     return response.findAllClicks.data
   }
 
-  async findAllClicksByShortUrl(urlId: string): Promise<[ClickModel]> {
-    const response = await this.gqlClient.request<FindAllClicksByShortUrlModel>(
-      FIND_ALL_CLICKS_BY_SHORT_URL,
-      {urlId},
+  async findAllClicksByLinkId(linkId: string): Promise<[ClickModel]> {
+    const response = await this.gqlClient.request<FindAllClicksByLinkIdModel>(
+      FIND_ALL_CLICKS_BY_LINK_ID,
+      {linkId},
     )
 
-    return response.findAllClicksByShortUrl.data
+    return response.findAllClicksByLinkId.data
   }
 
   async createClick(input: Click): Promise<ClickModel> {

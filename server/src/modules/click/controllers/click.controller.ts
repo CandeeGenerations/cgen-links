@@ -15,11 +15,11 @@ export class ClickController {
     return clicks.sort((a, b) => Number(b.clickedTs) - Number(a.clickedTs))
   }
 
-  @Get(':urlId')
-  async findAllClicksByShortUrl(
-    @Param('urlId') urlId: string,
+  @Get(':linkId')
+  async findAllClicksByLinkId(
+    @Param('linkId') linkId: string,
   ): Promise<ClickModel[]> {
-    const clicks = await this.clickService.findAllClicksByShortUrl(urlId)
+    const clicks = await this.clickService.findAllClicksByLinkId(linkId)
 
     return clicks.sort((a, b) => Number(b.clickedTs) - Number(a.clickedTs))
   }

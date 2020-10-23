@@ -1,16 +1,43 @@
-import {Click, ShortUrl, User} from './graphql.schema'
+import {
+  Click,
+  Link,
+  User,
+  Settings,
+  Colors,
+  SocialLinks,
+} from './graphql.schema'
 
 export interface ConfigModel {
   routingUrl: string
   gClientId: string
 }
 
-export interface ShortUrlInput {
-  fullUrl: string
-  shortCode?: string
+export interface LinkInput {
+  title: string
+  destination: string
+  description?: string
 }
 
-export interface ShortUrlModel extends ShortUrl {
+export interface ColorsInput {
+  primary?: string
+  secondary?: string
+}
+
+export interface SocialLinksInput {
+  facebook?: string
+  instagram?: string
+  twitter?: string
+  youtube?: string
+}
+
+export interface SettingsInput {
+  slug: string
+  logoUrl?: string
+  colors?: ColorsInput
+  socialLinks?: SocialLinksInput
+}
+
+export interface LinkModel extends Link {
   _id: string
   _ts: string
   clicks: number
@@ -26,26 +53,35 @@ export interface UserModel extends User {
   _ts: string
 }
 
-export interface FindAllShortUrlsModel {
-  findAllShortUrls: {
-    data: [ShortUrlModel]
+export interface SettingsModel extends Settings {
+  _id: string
+  _ts: string
+}
+
+export interface FindAllLinksModel {
+  findAllLinks: {
+    data: [LinkModel]
   }
 }
 
-export interface FindShortUrlModel {
-  findShortUrl: ShortUrlModel
+export interface FindLinkByIdModel {
+  findLinkByID: LinkModel
 }
 
-export interface FindShortUrlByIdModel {
-  findShortUrlByID: ShortUrlModel
+export interface FindLinkByTitleModel {
+  findLinkByTitle: LinkModel
 }
 
-export interface CreateShortUrlModel {
-  createShortUrl: ShortUrlModel
+export interface FindLinkByDestinationModel {
+  findLinkByDestination: LinkModel
 }
 
-export interface UpdateShortUrlModel {
-  updateShortUrl: ShortUrlModel
+export interface CreateLinkModel {
+  createLink: LinkModel
+}
+
+export interface UpdateLinkModel {
+  updateLink: LinkModel
 }
 
 export interface FindAllClicksModel {
@@ -54,8 +90,8 @@ export interface FindAllClicksModel {
   }
 }
 
-export interface FindAllClicksByShortUrlModel {
-  findAllClicksByShortUrl: {
+export interface FindAllClicksByLinkIdModel {
+  findAllClicksByLinkId: {
     data: [ClickModel]
   }
 }
@@ -74,4 +110,16 @@ export interface FindUserByGoogleIdModel {
 
 export interface FindAuthorizedUserModel {
   findAuthorizedUser: UserModel
+}
+
+export interface FindSettingsByUserIdModel {
+  findSettingsByUserId: SettingsModel
+}
+
+export interface CreateSettingsModel {
+  createSettings: SettingsModel
+}
+
+export interface UpdateSettingsModel {
+  updateSettings: SettingsModel
 }

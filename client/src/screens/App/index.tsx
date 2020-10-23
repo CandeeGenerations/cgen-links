@@ -2,17 +2,23 @@ import React, {useEffect, useState} from 'react'
 import Menu from 'antd/es/menu'
 import Layout from 'antd/es/layout'
 import ALink from 'antd/es/typography/Link'
-import {Switch, Route, Link, BrowserRouter, Redirect} from 'react-router-dom'
+import {
+  Switch,
+  Route,
+  Link as RLink,
+  BrowserRouter,
+  Redirect,
+} from 'react-router-dom'
 
 import './app.css'
 
 import Home from '../Home'
-import ShortCodes from '../ShortCodes'
-import NewShortCode from '../NewShortCode'
-import {authTokenKey} from '../../helpers'
+import Links from '../Links'
+import NewLink from '../NewLink'
+import Link from '../Links/Link'
 import {getConfig} from '../../api'
+import {authTokenKey} from '../../helpers'
 import {ConfigModel} from '../../models/models'
-import ShortCode from '../ShortCodes/ShortCode'
 
 const {Header, Content, Footer} = Layout
 
@@ -52,11 +58,11 @@ const App = () => {
             <Header>
               <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['1']}>
                 <Menu.Item key="1">
-                  <Link to="/new">New Short Code</Link>
+                  <RLink to="/new">New Link</RLink>
                 </Menu.Item>
 
                 <Menu.Item key="2">
-                  <Link to="/codes">Short Codes</Link>
+                  <RLink to="/links">Links</RLink>
                 </Menu.Item>
 
                 <Menu.Item key="3" style={{float: 'right'}}>
@@ -69,10 +75,10 @@ const App = () => {
           <Content style={{padding: loggedIn ? '0 50px' : '50px 50px 0'}}>
             <Switch>
               <Route
-                path="/codes/:id"
+                path="/links/:id"
                 render={({location}) =>
                   loggedIn ? (
-                    <ShortCode />
+                    <Link />
                   ) : (
                     <Redirect
                       to={{
@@ -85,10 +91,10 @@ const App = () => {
               />
 
               <Route
-                path="/codes"
+                path="/links"
                 render={({location}) =>
                   loggedIn ? (
-                    <ShortCodes />
+                    <Links />
                   ) : (
                     <Redirect
                       to={{
@@ -104,7 +110,7 @@ const App = () => {
                 path="/new"
                 render={({location}) =>
                   loggedIn ? (
-                    <NewShortCode />
+                    <NewLink />
                   ) : (
                     <Redirect
                       to={{

@@ -1,62 +1,80 @@
 import {gql} from 'graphql-request'
 
-export const FIND_ALL_SHORT_URLS = gql`
-  query FindAllShortUrls {
-    findAllShortUrls {
+export const FIND_ALL_LINKS = gql`
+  query FindAllLinks {
+    findAllLinks {
       data {
         _id
         _ts
-        shortCode
-        fullUrl
+        title
+        destination
+        description
         addedTs
       }
     }
   }
 `
 
-export const FIND_SHORT_URL_BY_ID = gql`
-  query FindShortUrlById($id: ID!) {
-    findShortUrlByID(id: $id) {
+export const FIND_LINK_BY_TITLE = gql`
+  query FindLinkByTitle($title: String!) {
+    findLinkByTitle(title: $title) {
       _id
       _ts
-      shortCode
-      fullUrl
+      title
+      destination
+      description
       addedTs
     }
   }
 `
 
-export const FIND_SHORT_URL = gql`
-  query FindShortUrl($shortCode: String!) {
-    findShortUrl(shortCode: $shortCode) {
+export const FIND_LINK_BY_DESTINATION = gql`
+  query FindLinkByDestination($destination: String!) {
+    findLinkByDestination(destination: $destination) {
       _id
       _ts
-      shortCode
-      fullUrl
+      title
+      destination
+      description
       addedTs
     }
   }
 `
 
-export const CREATE_SHORT_URL = gql`
-  mutation CreateShortUrl($input: ShortUrlInput!) {
-    createShortUrl(data: $input) {
+export const FIND_LINK_BY_ID = gql`
+  query FindLinkById($id: ID!) {
+    findLinkByID(id: $id) {
       _id
       _ts
-      shortCode
-      fullUrl
+      title
+      destination
+      description
       addedTs
     }
   }
 `
 
-export const UPDATE_SHORT_URL = gql`
-  mutation UpdateShortUrl($id: ID!, $input: ShortUrlInput!) {
-    updateShortUrl(id: $id, data: $input) {
+export const CREATE_LINK = gql`
+  mutation CreateLink($input: LinkInput!) {
+    createLink(data: $input) {
       _id
       _ts
-      shortCode
-      fullUrl
+      title
+      destination
+      description
+      addedTs
+    }
+  }
+`
+
+export const UPDATE_LINK = gql`
+  mutation UpdateLink($id: ID!, $input: LinkInput!) {
+    updateLink(id: $id, data: $input) {
+      _id
+      _ts
+      title
+      destination
+      description
       addedTs
     }
   }
@@ -68,7 +86,7 @@ export const FIND_ALL_CLICKS = gql`
       data {
         _id
         _ts
-        urlId
+        linkId
         clickedTs
         language
         userAgent
@@ -81,13 +99,13 @@ export const FIND_ALL_CLICKS = gql`
   }
 `
 
-export const FIND_ALL_CLICKS_BY_SHORT_URL = gql`
-  query FindAllClicksByShortUrl($urlId: ID!) {
-    findAllClicksByShortUrl(urlId: $urlId) {
+export const FIND_ALL_CLICKS_BY_LINK_ID = gql`
+  query FindAllClicksByLinkId($linkId: ID!) {
+    findAllClicksByLinkId(linkId: $linkId) {
       data {
         _id
         _ts
-        urlId
+        linkId
         clickedTs
         language
         userAgent
@@ -105,7 +123,7 @@ export const CREATE_CLICK = gql`
     createClick(data: $input) {
       _id
       _ts
-      urlId
+      linkId
       clickedTs
       language
       userAgent
@@ -155,6 +173,72 @@ export const FIND_AUTHORIZED_USER = gql`
       lastName
       googleId
       authorized
+    }
+  }
+`
+
+export const FIND_SETTINGS_BY_USER_ID = gql`
+  query FindSettingsByUserId($userId: ID!) {
+    findSettingsByUserId(userId: $userId) {
+      _id
+      _ts
+      userId
+      slug
+      logoUrl
+      colors {
+        primary
+        secondary
+      }
+      socialLinks {
+        facebook
+        instagram
+        twitter
+        youtube
+      }
+    }
+  }
+`
+
+export const CREATE_SETTINGS = gql`
+  query CreateSettings($input: SettingsInput!) {
+    createSettings(data: $input) {
+      _id
+      _ts
+      userId
+      slug
+      logoUrl
+      colors {
+        primary
+        secondary
+      }
+      socialLinks {
+        facebook
+        instagram
+        twitter
+        youtube
+      }
+    }
+  }
+`
+
+export const UPDATE_SETTINGS = gql`
+  query UpdateSettings($id: ID!, $input: SettingsInput!) {
+    updateSettings(id: $id, data: $input) {
+      _id
+      _ts
+      userId
+      slug
+      logoUrl
+      colors {
+        primary
+        secondary
+      }
+      socialLinks {
+        facebook
+        instagram
+        twitter
+        youtube
+      }
     }
   }
 `

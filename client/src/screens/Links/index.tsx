@@ -10,16 +10,16 @@ import Table, {ColumnsType} from 'antd/es/table'
 import {ConfigContext} from '../App'
 import {formatDate} from '../../helpers'
 import Title from '../../components/Title'
-import {findAllShortUrls} from '../../api'
+import {findAllLinks} from '../../api'
 import Container from '../../components/Container'
-import {ShortUrlModel} from '../../models/models'
+import {LinkModel} from '../../models/models'
 
 const ShortCodes = () => {
   const configContext = useContext(ConfigContext)
   const [loading, setLoading] = useState(true)
-  const [allShortUrls, setAllShortUrls] = useState<ShortUrlModel[]>([])
+  const [allShortUrls, setAllShortUrls] = useState<LinkModel[]>([])
 
-  const columns: ColumnsType<ShortUrlModel> = [
+  const columns: ColumnsType<LinkModel> = [
     {
       title: 'Short Code',
       dataIndex: 'shortCode',
@@ -63,7 +63,7 @@ const ShortCodes = () => {
     {
       title: 'Action',
       key: 'action',
-      render: (text: string, record: ShortUrlModel) => (
+      render: (text: string, record: LinkModel) => (
         <Space size="middle">
           <Link to={`/codes/${record._id}`}>View Details</Link>
         </Space>
@@ -72,7 +72,7 @@ const ShortCodes = () => {
   ]
 
   const getShortUrls = async () => {
-    const response = await findAllShortUrls()
+    const response = await findAllLinks()
 
     setAllShortUrls(response)
     setLoading(false)

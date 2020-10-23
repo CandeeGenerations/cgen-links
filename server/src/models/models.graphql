@@ -1,11 +1,12 @@
-type ShortUrl {
-  fullUrl: String!
-  shortCode: String
+type Link {
+  title: String!
+  destination: String!
+  description: String
   addedTs: String!
 }
 
 type Click {
-  urlId: ID!
+  linkId: ID!
   clickedTs: String!
   ipAddress: String
   language: String
@@ -13,6 +14,26 @@ type Click {
   country: String
   region: String
   city: String
+}
+
+type Colors {
+  primary: String
+  secondary: String
+}
+
+type SocialLinks {
+  facebook: String
+  instagram: String
+  twitter: String
+  youtube: String
+}
+
+type Settings {
+  userId: ID!
+  slug: String!
+  logoUrl: String
+  colors: Colors
+  socialLinks: SocialLinks
 }
 
 type User {
@@ -24,12 +45,15 @@ type User {
 }
 
 type Query {
-  findAllShortUrls: [ShortUrl]!
-  findShortUrl(shortCode: String!): ShortUrl
+  findAllLinks: [Link]!
+  findLinkByTitle(title: String!): Link
+  findLinkByDestination(destination: String!): Link
 
   findAllClicks: [Click]!
-  findAllClicksByShortUrl(urlId: ID!): [Click]!
+  findAllClicksByLinkId(linkId: ID!): [Click]!
 
   findUserByGoogleId(googleId: String!): User
   findAuthorizedUser(googleId: String!, authorized: Boolean!): User
+
+  findSettingsByUserId(userId: ID!): Settings
 }

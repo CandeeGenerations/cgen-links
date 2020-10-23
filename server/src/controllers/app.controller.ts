@@ -9,11 +9,9 @@ export class AppController {
 
   @Get()
   getConfig(): ConfigModel {
-    const config: ConfigModel = {
+    return {
       gClientId: this.configService.get<string>('G_CLIENT_ID'),
       routingUrl: this.configService.get<string>('ROUTING_URL'),
     }
-
-    return config
   }
 }

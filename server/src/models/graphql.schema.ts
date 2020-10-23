@@ -6,14 +6,15 @@
 
 /* tslint:disable */
 /* eslint-disable */
-export class ShortUrl {
-    fullUrl: string;
-    shortCode?: string;
+export class Link {
+    title: string;
+    destination: string;
+    description?: string;
     addedTs: string;
 }
 
 export class Click {
-    urlId: string;
+    linkId: string;
     clickedTs: string;
     ipAddress?: string;
     language?: string;
@@ -21,6 +22,26 @@ export class Click {
     country?: string;
     region?: string;
     city?: string;
+}
+
+export class Colors {
+    primary?: string;
+    secondary?: string;
+}
+
+export class SocialLinks {
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+    youtube?: string;
+}
+
+export class Settings {
+    userId: string;
+    slug: string;
+    logoUrl?: string;
+    colors?: Colors;
+    socialLinks?: SocialLinks;
 }
 
 export class User {
@@ -32,15 +53,17 @@ export class User {
 }
 
 export abstract class IQuery {
-    abstract findAllShortUrls(): ShortUrl[] | Promise<ShortUrl[]>;
+    abstract findAllLinks(): Link[] | Promise<Link[]>;
 
-    abstract findShortUrl(shortCode: string): ShortUrl | Promise<ShortUrl>;
+    abstract findLinkByTitle(title: string): Link | Promise<Link>;
 
     abstract findAllClicks(): Click[] | Promise<Click[]>;
 
-    abstract findAllClicksByShortUrl(urlId: string): Click[] | Promise<Click[]>;
+    abstract findAllClicksByLinkId(linkId: string): Click[] | Promise<Click[]>;
 
     abstract findUserByGoogleId(googleId: string): User | Promise<User>;
 
     abstract findAuthorizedUser(googleId: string, authorized: boolean): User | Promise<User>;
+
+    abstract findSettingsByUserId(userId: string): Settings | Promise<Settings>;
 }
