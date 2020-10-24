@@ -1,9 +1,9 @@
-import {Body, Controller, Get, Param, Post, Put} from '@nestjs/common'
+import {Body, Controller, Get, Param, Post, Put, Query} from '@nestjs/common'
 
 import {asyncForEach} from 'src/helpers'
-import {Link} from 'src/models/graphql.schema'
 import {LinkService} from '../services/link.service'
-import {LinkInput, LinkModel} from 'src/models/models'
+import {LinkModel, LinkPageModel} from 'src/models/override.model'
+import {Link, LinkInput, LinkPage} from 'src/models/graphql.schema'
 import {ClickService} from 'src/modules/click/services/click.service'
 
 @Controller('api/link')
@@ -13,31 +13,61 @@ export class LinkController {
     private readonly clickService: ClickService,
   ) {}
 
-  @Get()
-  async findAllLinks(): Promise<LinkModel[]> {
-    const links = await this.linkService.findAllLinks()
+  @Get(':owner')
+  async findLinksByOwner(
+    @Param('owner') owner: string,
+  ): Promise<LinkPageModel> {
+    const linksByOwner = await this.linkService.findLinksByOwner(owner)
+    const links: LinkModel[] = []
 
-    await asyncForEach(links, async url => {
-      const clicks = await this.clickService.findAllClicksByLinkId(url._id)
+    await asyncForEach(linksByOwner.data, async link => {
+      const clickCount = await this.clickService.clickCountByOwner(
+        link.owner._id,
+      )
 
-      url.clicks = clicks.length
+      links.push({
+        ...link,
+        clickCount,
+      })
     })
 
-    return links.sort((a, b) => Number(b.addedTs) - Number(a.addedTs))
+    const sortedLinks = links.sort(
+      (a, b) => Number(b.addedTs) - Number(a.addedTs),
+    )
+
+    delete linksByOwner.data
+
+    return {
+      ...linksByOwner,
+      data: sortedLinks,
+    }
   }
 
-  @Get('/id/:id')
-  findLinkById(@Param('id') id: string): Promise<LinkModel> {
+  @Get('id/:id')
+  findLinkById(@Param('id') id: string): Promise<Link> {
     return this.linkService.findLinkById(id)
   }
 
   @Post()
-  createLink(@Body() input: LinkInput): Promise<LinkModel> {
+  createLink(@Body() input: LinkInput): Promise<Link> {
     return this.linkService.createLink(input)
   }
 
   @Put(':id')
-  updateLink(@Param('id') id: string, @Body() input: Link): Promise<LinkModel> {
+  updateLink(@Param('id') id: string, @Body() input: LinkInput): Promise<Link> {
     return this.linkService.updateLink(id, input)
+  }
+
+  @Post(':id/toggle-active')
+  toggleActiveLink(
+    @Param('id') id: string,
+    @Query('active') active: string,
+  ): Promise<Link> {
+    return this.linkService.toggleActiveLink(id, active === 'true')
+  }
+
+  @Post(':id/delete')
+  softDeleteLink(@Param('id') id: string): Promise<Link> {
+    return this.linkService.softDeleteLink(id)
   }
 }

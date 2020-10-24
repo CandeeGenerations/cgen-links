@@ -1,20 +1,19 @@
 import {Body, Controller, Get, Param, Post} from '@nestjs/common'
-import {User} from 'src/models/graphql.schema'
 
-import {UserModel} from 'src/models/models'
 import {AuthService} from '../services/auth.service'
+import {User, UserInput} from 'src/models/graphql.schema'
 
 @Controller('api/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post()
-  findOrCreateUser(@Body('user') user: User): Promise<UserModel> {
-    return this.authService.findOrCreateUser(user)
+  findOrCreateUser(@Body() input: UserInput): Promise<User> {
+    return this.authService.findOrCreateUser(input)
   }
 
   @Get(':googleId')
-  findAuthorizedUser(@Param('googleId') googleId: string): Promise<UserModel> {
+  findAuthorizedUser(@Param('googleId') googleId: string): Promise<User> {
     return this.authService.findAuthorizedUser(googleId)
   }
 }

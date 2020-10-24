@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import Row from 'antd/es/row'
 import Col from 'antd/es/col'
 import Table from 'antd/es/table'
@@ -8,7 +8,6 @@ import Text from 'antd/es/typography/Text'
 import Breadcrumb from 'antd/es/breadcrumb'
 import {useParams, Link as RLink} from 'react-router-dom'
 
-import {ConfigContext} from '../App'
 import {formatDate} from '../../helpers'
 import Title from '../../components/Title'
 import Container from '../../components/Container'
@@ -56,11 +55,10 @@ const columns = [
 
 const Link = () => {
   const {id} = useParams<{id: string}>()
-  const configContext = useContext(ConfigContext)
 
+  const [loadingLink, setLoadingLink] = useState(true)
   const [clicks, setClicks] = useState<ClickModel[]>([])
   const [loadingClicks, setLoadingClicks] = useState(true)
-  const [loadingLink, setLoadingLink] = useState(true)
   const [link, setLink] = useState<LinkModel | null>(null)
 
   const getShortUrl = async () => {
@@ -87,10 +85,6 @@ const Link = () => {
       <Container span={20} background={false}>
         <Breadcrumb style={{margin: '16px 0'}}>
           <Breadcrumb.Item>
-            <RLink to="/new">Home</RLink>
-          </Breadcrumb.Item>
-
-          <Breadcrumb.Item>
             <RLink to="/links">Links</RLink>
           </Breadcrumb.Item>
 
@@ -99,20 +93,20 @@ const Link = () => {
       </Container>
 
       <Container span={20}>
-        <Title>Link</Title>
+        <Title link={{title: 'Edit Link', to: `/links/edit/${id}`}}>Link</Title>
 
         {loadingLink || !link ? (
           <Skeleton active />
         ) : (
           <>
             <Row gutter={[16, {md: 16, sm: 24, xs: 24}]}>
-              <Col md={4} sm={24} xs={24}>
+              <Col md={6} sm={24} xs={24}>
                 <strong>Title:</strong>
                 <br />
                 <Text>{link.title}</Text>
               </Col>
 
-              <Col md={12} sm={24} xs={24}>
+              <Col md={10} sm={24} xs={24}>
                 <strong>Destination:</strong>
                 <br />
                 <Text code copyable>
@@ -123,7 +117,9 @@ const Link = () => {
               <Col md={8} sm={24} xs={24}>
                 <strong>Date Added:</strong>
                 <br />
-                <Text>{formatDate(link.addedTs)}</Text>
+                <Text>
+                  {link.addedTs ? formatDate(link.addedTs) : <em>None</em>}
+                </Text>
               </Col>
             </Row>
 
@@ -131,7 +127,7 @@ const Link = () => {
               <Col span={24}>
                 <strong>Description:</strong>
                 <br />
-                <Text>{link.description}</Text>
+                <Text>{link.description || <em>None</em>}</Text>
               </Col>
             </Row>
           </>

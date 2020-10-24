@@ -1,188 +1,53 @@
 import {gql} from 'graphql-request'
 
-export const FIND_ALL_LINKS = gql`
-  query FindAllLinks {
-    findAllLinks {
-      data {
-        _id
-        _ts
-        title
-        destination
-        description
-        addedTs
-      }
+const FRAGMENTS = {
+  // User
+  USER: gql`
+    fragment UserFragments on User {
+      _id
+      _ts
+      googleId
+      firstName
+      lastName
+      email
+      authorized
     }
-  }
-`
+  `,
 
-export const FIND_LINK_BY_TITLE = gql`
-  query FindLinkByTitle($title: String!) {
-    findLinkByTitle(title: $title) {
+  // Link
+  LINK: gql`
+    fragment LinkFragments on Link {
       _id
       _ts
       title
       destination
       description
       addedTs
+      active
+      deleted
     }
-  }
-`
+  `,
 
-export const FIND_LINK_BY_DESTINATION = gql`
-  query FindLinkByDestination($destination: String!) {
-    findLinkByDestination(destination: $destination) {
+  // Click
+  CLICK: gql`
+    fragment ClickFragments on Click {
       _id
       _ts
-      title
-      destination
-      description
-      addedTs
-    }
-  }
-`
-
-export const FIND_LINK_BY_ID = gql`
-  query FindLinkById($id: ID!) {
-    findLinkByID(id: $id) {
-      _id
-      _ts
-      title
-      destination
-      description
-      addedTs
-    }
-  }
-`
-
-export const CREATE_LINK = gql`
-  mutation CreateLink($input: LinkInput!) {
-    createLink(data: $input) {
-      _id
-      _ts
-      title
-      destination
-      description
-      addedTs
-    }
-  }
-`
-
-export const UPDATE_LINK = gql`
-  mutation UpdateLink($id: ID!, $input: LinkInput!) {
-    updateLink(id: $id, data: $input) {
-      _id
-      _ts
-      title
-      destination
-      description
-      addedTs
-    }
-  }
-`
-
-export const FIND_ALL_CLICKS = gql`
-  query FindAllClicks {
-    findAllClicks {
-      data {
-        _id
-        _ts
-        linkId
-        clickedTs
-        language
-        userAgent
-        ipAddress
-        country
-        region
-        city
-      }
-    }
-  }
-`
-
-export const FIND_ALL_CLICKS_BY_LINK_ID = gql`
-  query FindAllClicksByLinkId($linkId: ID!) {
-    findAllClicksByLinkId(linkId: $linkId) {
-      data {
-        _id
-        _ts
-        linkId
-        clickedTs
-        language
-        userAgent
-        ipAddress
-        country
-        region
-        city
-      }
-    }
-  }
-`
-
-export const CREATE_CLICK = gql`
-  mutation CreateClick($input: ClickInput!) {
-    createClick(data: $input) {
-      _id
-      _ts
-      linkId
       clickedTs
+      ipAddress
       language
       userAgent
-      ipAddress
       country
       region
       city
     }
-  }
-`
+  `,
 
-export const CREATE_USER = gql`
-  mutation CreateUser($input: UserInput!) {
-    createUser(data: $input) {
+  // Settings
+  SETTINGS: gql`
+    fragment SettingsFragments on Settings {
       _id
       _ts
-      email
-      firstName
-      lastName
-      googleId
-      authorized
-    }
-  }
-`
-
-export const FIND_USER_BY_GOOGLE_ID = gql`
-  query FindUserByGoogleId($googleId: String!) {
-    findUserByGoogleId(googleId: $googleId) {
-      _id
-      _ts
-      email
-      firstName
-      lastName
-      googleId
-      authorized
-    }
-  }
-`
-
-export const FIND_AUTHORIZED_USER = gql`
-  query FindAuthorizedUser($googleId: String!) {
-    findAuthorizedUser(googleId: $googleId, authorized: true) {
-      _id
-      _ts
-      email
-      firstName
-      lastName
-      googleId
-      authorized
-    }
-  }
-`
-
-export const FIND_SETTINGS_BY_USER_ID = gql`
-  query FindSettingsByUserId($userId: ID!) {
-    findSettingsByUserId(userId: $userId) {
-      _id
-      _ts
-      userId
       slug
       logoUrl
       primaryColor
@@ -192,41 +57,220 @@ export const FIND_SETTINGS_BY_USER_ID = gql`
       twitter
       youtube
     }
-  }
-`
+  `,
+}
 
-export const CREATE_SETTINGS = gql`
-  mutation CreateSettings($input: SettingsInput!) {
-    createSettings(data: $input) {
-      _id
-      _ts
-      userId
-      slug
-      logoUrl
-      primaryColor
-      secondaryColor
-      facebook
-      instagram
-      twitter
-      youtube
-    }
-  }
-`
+const GQL = {
+  // USER
+  USER: {
+    // Create User
+    CREATE_USER: gql`
+      mutation createUser($input: UserInput!) {
+        createUser(data: $input) {
+          ...UserFragments
+        }
+      }
+      ${FRAGMENTS.USER}
+    `,
 
-export const UPDATE_SETTINGS = gql`
-  mutation UpdateSettings($id: ID!, $input: SettingsInput!) {
-    updateSettings(id: $id, data: $input) {
-      _id
-      _ts
-      userId
-      slug
-      logoUrl
-      primaryColor
-      secondaryColor
-      facebook
-      instagram
-      twitter
-      youtube
-    }
-  }
-`
+    // Find User By Google ID
+    FIND_USER_BY_GOOGLE_ID: gql`
+      query findUserByGoogleId($googleId: String!) {
+        findUserByGoogleId(googleId: $googleId) {
+          ...UserFragments
+          settings {
+            ...SettingsFragments
+          }
+        }
+      }
+      ${FRAGMENTS.USER}
+      ${FRAGMENTS.SETTINGS}
+    `,
+
+    // Find Authorized User
+    FIND_AUTHORIZED_USER: gql`
+      query findAuthorizedUser($googleId: String!) {
+        findAuthorizedUser(googleId: $googleId, authorized: true) {
+          ...UserFragments
+          settings {
+            ...SettingsFragments
+          }
+        }
+      }
+      ${FRAGMENTS.USER}
+      ${FRAGMENTS.SETTINGS}
+    `,
+  },
+
+  // Link
+  LINK: {
+    // Create Link
+    CREATE_LINK: gql`
+      mutation createLink($input: LinkInput!) {
+        createLink(data: $input) {
+          ...LinkFragments
+          owner {
+            _id
+          }
+        }
+      }
+      ${FRAGMENTS.LINK}
+    `,
+
+    // Update Link
+    UPDATE_LINK: gql`
+      mutation updateLink($id: ID!, $input: LinkInput!) {
+        updateLink(id: $id, data: $input) {
+          ...LinkFragments
+          owner {
+            _id
+          }
+        }
+      }
+      ${FRAGMENTS.LINK}
+    `,
+
+    // Toggle Active Link
+    TOGGLE_ACTIVE_LINK: gql`
+      mutation toggleActiveLink($id: ID!, $active: Boolean!) {
+        toggleActiveLink(id: $id, active: $active) {
+          ...LinkFragments
+          owner {
+            _id
+          }
+        }
+      }
+      ${FRAGMENTS.LINK}
+    `,
+
+    // Soft Delete Link
+    SOFT_DELETE_LINK: gql`
+      mutation softDeleteLink($id: ID!) {
+        softDeleteLink(id: $id) {
+          _id
+          active
+          deleted
+        }
+      }
+    `,
+
+    // Find Link By ID
+    FIND_LINK_BY_ID: gql`
+      query findLinkByID($id: ID!) {
+        findLinkByID(id: $id) {
+          ...LinkFragments
+          owner {
+            _id
+          }
+        }
+      }
+      ${FRAGMENTS.LINK}
+    `,
+
+    // Find Links By Owner
+    FIND_LINKS_BY_OWNER: gql`
+      query findLinksByOwner($owner: ID!) {
+        findLinksByOwner(owner: $owner) {
+          data {
+            ...LinkFragments
+            owner {
+              _id
+            }
+          }
+        }
+      }
+      ${FRAGMENTS.LINK}
+    `,
+
+    // Find Links By Title
+    FIND_LINKS_BY_TITLE: gql`
+      query findLinksByTitle($owner: ID!, $title: String!) {
+        findLinksByTitle(owner: $owner, title: $title) {
+          data {
+            _id
+          }
+        }
+      }
+    `,
+
+    // Find Links By Destination
+    FIND_LINKS_BY_DESTINATION: gql`
+      query findLinksByDestination($owner: ID!, $destination: String!) {
+        findLinksByDestination(owner: $owner, destination: $destination) {
+          data {
+            _id
+          }
+        }
+      }
+    `,
+  },
+
+  // Click
+  CLICK: {
+    // Create Click
+    CREATE_CLICK: gql`
+      mutation createClick($input: ClickInput!) {
+        createClick(data: $input) {
+          ...ClickFragments
+          owner {
+            _id
+          }
+        }
+      }
+      ${FRAGMENTS.CLICK}
+    `,
+
+    // Find Clicks By Owner
+    FIND_CLICKS_BY_OWNER: gql`
+      query findClicksByOwner($owner: ID!) {
+        findClicksByOwner(owner: $owner) {
+          data {
+            ...ClickFragments
+            owner {
+              _id
+            }
+          }
+        }
+      }
+      ${FRAGMENTS.CLICK}
+    `,
+
+    // Click Count By Owner
+    CLICK_COUNT_BY_OWNER: gql`
+      query clickCountByOwner($owner: ID!) {
+        clickCountByOwner(owner: $owner)
+      }
+    `,
+  },
+
+  // Settings
+  SETTINGS: {
+    // Create Settings
+    CREATE_SETTINGS: gql`
+      mutation createSettings($input: SettingsInput!) {
+        createSettings(data: $input) {
+          ...SettingsFragments
+          owner {
+            _id
+          }
+        }
+      }
+      ${FRAGMENTS.SETTINGS}
+    `,
+
+    // Update Settings
+    UPDATE_SETTINGS: gql`
+      mutation updateSettings($id: ID!, $input: SettingsInput!) {
+        updateSettings(id: $id, data: $input) {
+          ...SettingsFragments
+          owner {
+            _id
+          }
+        }
+      }
+      ${FRAGMENTS.SETTINGS}
+    `,
+  },
+}
+
+export default GQL

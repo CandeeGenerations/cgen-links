@@ -1,55 +1,33 @@
 import {Injectable} from '@nestjs/common'
 import {GraphQLClient} from 'graphql-request'
 
+import GQL from 'src/models/gqlRequests'
 import {getGQLClient} from 'src/api/graphqlRequest'
-import {
-  CREATE_SETTINGS,
-  FIND_SETTINGS_BY_USER_ID,
-  UPDATE_SETTINGS,
-} from 'src/models/gqlRequests'
-import {
-  CreateSettingsModel,
-  FindSettingsByUserIdModel,
-  SettingsInput,
-  SettingsModel,
-  UpdateSettingsModel,
-} from 'src/models/models'
+import {Settings, SettingsInput} from 'src/models/graphql.schema'
+import {CreateSettings, UpdateSettings} from 'src/models/override.model'
 
 @Injectable()
 export class SettingsService {
   private gqlClient: GraphQLClient
+  private settingsGql = GQL.SETTINGS
 
   constructor() {
     this.gqlClient = getGQLClient()
   }
 
-  async findSettingsByUserId(userId: string): Promise<SettingsModel> {
-    const response = await this.gqlClient.request<FindSettingsByUserIdModel>(
-      FIND_SETTINGS_BY_USER_ID,
-      {userId},
-    )
+  async createSettings(input: SettingsInput): Promise<Settings> {
+    const {createSettings: response} = await this.gqlClient.request<
+      CreateSettings
+    >(this.settingsGql.CREATE_SETTINGS, {input})
 
-    return response.findSettingsByUserId
+    return response
   }
 
-  async createSettings(input: SettingsInput): Promise<SettingsModel> {
-    const response = await this.gqlClient.request<CreateSettingsModel>(
-      CREATE_SETTINGS,
-      {input},
-    )
+  async updateSettings(id: string, input: SettingsInput): Promise<Settings> {
+    const {updateSettings: response} = await this.gqlClient.request<
+      UpdateSettings
+    >(this.settingsGql.UPDATE_SETTINGS, {id, input})
 
-    return response.createSettings
-  }
-
-  async updateSettings(
-    id: string,
-    input: SettingsInput,
-  ): Promise<SettingsModel> {
-    const response = await this.gqlClient.request<UpdateSettingsModel>(
-      UPDATE_SETTINGS,
-      {id, input},
-    )
-
-    return response.updateSettings
+    return response
   }
 }

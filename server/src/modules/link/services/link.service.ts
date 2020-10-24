@@ -2,69 +2,64 @@ import * as dayjs from 'dayjs'
 import {GraphQLClient} from 'graphql-request'
 import {BadRequestException, Injectable} from '@nestjs/common'
 
-import {Link} from 'src/models/graphql.schema'
+import GQL from 'src/models/gqlRequests'
 import {getGQLClient} from 'src/api/graphqlRequest'
+import {Link, LinkInput, LinkPage} from 'src/models/graphql.schema'
 import {
-  CREATE_LINK,
-  FIND_ALL_LINKS,
-  UPDATE_LINK,
-  FIND_LINK_BY_ID,
-  FIND_LINK_BY_TITLE,
-  FIND_LINK_BY_DESTINATION,
-} from 'src/models/gqlRequests'
-import {
-  CreateLinkModel,
-  FindAllLinksModel,
-  FindLinkByIdModel,
-  FindLinkByTitleModel,
-  FindLinkByDestinationModel,
-  LinkInput,
-  LinkModel,
-  UpdateLinkModel,
-} from 'src/models/models'
+  CreateLink,
+  FindLinkByID,
+  FindLinksByDestination,
+  FindLinksByOwner,
+  FindLinksByTitle,
+  SoftDeleteLink,
+  ToggleActiveLink,
+  UpdateLink,
+} from 'src/models/override.model'
 
 @Injectable()
 export class LinkService {
   private gqlClient: GraphQLClient
+  private linkGql = GQL.LINK
 
   constructor() {
     this.gqlClient = getGQLClient()
   }
 
-  async findAllLinks(): Promise<[LinkModel]> {
-    const response = await this.gqlClient.request<FindAllLinksModel>(
-      FIND_ALL_LINKS,
+  async findLinkById(id: string): Promise<Link> {
+    const {findLinkByID: response} = await this.gqlClient.request<FindLinkByID>(
+      this.linkGql.FIND_LINK_BY_ID,
+      {
+        id,
+      },
     )
 
-    return response.findAllLinks.data
+    return response
   }
 
-  async findLinkById(id: string): Promise<LinkModel> {
-    const response = await this.gqlClient.request<FindLinkByIdModel>(
-      FIND_LINK_BY_ID,
-      {id},
-    )
+  async findLinksByOwner(owner: string): Promise<LinkPage> {
+    const {findLinksByOwner: response} = await this.gqlClient.request<
+      FindLinksByOwner
+    >(this.linkGql.FIND_LINKS_BY_OWNER, {
+      owner,
+    })
 
-    return response.findLinkByID
+    return response
   }
 
-  async createLink(input: LinkInput): Promise<LinkModel> {
-    const valid = await this.validateTitleAndDestination(
+  async createLink(input: LinkInput): Promise<Link> {
+    await this.validateTitleAndDestination(
+      input.owner.connect,
       input.title,
       input.destination,
     )
 
-    if (!valid) {
-      throw new BadRequestException(
-        'A link with this name or URL already exists. Please use a different name.',
-      )
-    }
-
-    const response = await this.gqlClient.request<CreateLinkModel>(
-      CREATE_LINK,
+    const {createLink: response} = await this.gqlClient.request<CreateLink>(
+      this.linkGql.CREATE_LINK,
       {
         input: {
           ...input,
+          active: true,
+          deleted: false,
           addedTs: dayjs()
             .valueOf()
             .toString(),
@@ -72,55 +67,80 @@ export class LinkService {
       },
     )
 
-    return response.createLink
+    return response
   }
 
-  async updateLink(id: string, input: Link): Promise<LinkModel> {
-    const valid = await this.validateTitleAndDestination(
+  async updateLink(id: string, input: LinkInput): Promise<Link> {
+    await this.validateTitleAndDestination(
+      input.owner.connect,
       input.title,
       input.destination,
       id,
     )
 
-    if (!valid) {
-      throw new BadRequestException(
-        'A link with this name or URL already exists. Please use a different name.',
-      )
-    }
-
-    const response = await this.gqlClient.request<UpdateLinkModel>(
-      UPDATE_LINK,
-      {id, input},
+    const {updateLink: response} = await this.gqlClient.request<UpdateLink>(
+      this.linkGql.UPDATE_LINK,
+      {
+        id,
+        input,
+      },
     )
 
-    return response.updateLink
+    return response
+  }
+
+  async toggleActiveLink(id: string, active: boolean): Promise<Link> {
+    const {toggleActiveLink: response} = await this.gqlClient.request<
+      ToggleActiveLink
+    >(this.linkGql.TOGGLE_ACTIVE_LINK, {
+      id,
+      active,
+    })
+
+    return response
+  }
+
+  async softDeleteLink(id: string): Promise<Link> {
+    const {softDeleteLink: response} = await this.gqlClient.request<
+      SoftDeleteLink
+    >(this.linkGql.SOFT_DELETE_LINK, {
+      id,
+    })
+
+    return response
   }
 
   private async validateTitleAndDestination(
+    owner: string,
     title: string,
     destination: string,
     linkId?: string,
-  ): Promise<boolean> {
-    const titleResponse = await this.gqlClient.request<FindLinkByTitleModel>(
-      FIND_LINK_BY_TITLE,
-      {title},
+  ): Promise<void> {
+    const {findLinksByTitle} = await this.gqlClient.request<FindLinksByTitle>(
+      this.linkGql.FIND_LINKS_BY_TITLE,
+      {owner, title},
     )
-    const existingTitleLink = titleResponse.findLinkByTitle
 
     if (
-      existingTitleLink &&
-      (!linkId || (linkId && existingTitleLink._id !== linkId))
+      findLinksByTitle.data.length > 0 &&
+      (!linkId || (linkId && findLinksByTitle.data[0]._id !== linkId))
     ) {
-      return false
+      throw new BadRequestException(
+        'A link with this title already exists. Please use a different name.',
+      )
     }
 
-    const urlResponse = await this.gqlClient.request<
-      FindLinkByDestinationModel
-    >(FIND_LINK_BY_DESTINATION, {destination})
-    const existingUrlLink = urlResponse.findLinkByDestination
+    const {findLinksByDestination} = await this.gqlClient.request<
+      FindLinksByDestination
+    >(this.linkGql.FIND_LINKS_BY_DESTINATION, {owner, destination})
 
-    return existingUrlLink && linkId
-      ? existingUrlLink._id === linkId
-      : !existingUrlLink
+    if (
+      findLinksByDestination.data.length > 0 &&
+      (!linkId || (linkId && findLinksByDestination.data[0]._id !== linkId))
+    ) {
+      throw new BadRequestException(
+        'A link with this URL already exists. Please use a different name.',
+      )
+    }
   }
 }

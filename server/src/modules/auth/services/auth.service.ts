@@ -1,59 +1,53 @@
 import {GraphQLClient} from 'graphql-request'
 import {Injectable, UnauthorizedException} from '@nestjs/common'
 
-import {User} from 'src/models/graphql.schema'
+import GQL from 'src/models/gqlRequests'
 import {getGQLClient} from 'src/api/graphqlRequest'
-import {
-  CreateUserModel,
-  FindAuthorizedUserModel,
-  FindUserByGoogleIdModel,
-  UserModel,
-} from 'src/models/models'
-import {
-  CREATE_USER,
-  FIND_AUTHORIZED_USER,
-  FIND_USER_BY_GOOGLE_ID,
-} from 'src/models/gqlRequests'
+import {User, UserInput} from 'src/models/graphql.schema'
+import {FindAuthorizedUser, FindUserByGoogleId} from 'src/models/override.model'
 
 @Injectable()
 export class AuthService {
   private gqlClient: GraphQLClient
+  private userGql = GQL.USER
 
   constructor() {
     this.gqlClient = getGQLClient()
   }
 
-  async findOrCreateUser(user: User): Promise<UserModel> {
-    const response = await this.gqlClient.request<FindUserByGoogleIdModel>(
-      FIND_USER_BY_GOOGLE_ID,
-      {googleId: user.googleId},
-    )
+  async findOrCreateUser(user: UserInput): Promise<User> {
+    const {findUserByGoogleId: response} = await this.gqlClient.request<
+      FindUserByGoogleId
+    >(this.userGql.FIND_USER_BY_GOOGLE_ID, {
+      googleId: user.googleId,
+    })
 
-    if (!response.findUserByGoogleId) {
-      await this.gqlClient.request<CreateUserModel>(CREATE_USER, {
+    if (!response) {
+      await this.gqlClient.request(this.userGql.CREATE_USER, {
         input: {...user, authorized: false},
       })
 
       throw new UnauthorizedException('You are not authorized to log in.')
     }
 
-    if (!response.findUserByGoogleId.authorized) {
+    if (!response.authorized) {
       throw new UnauthorizedException('You are not authorized to log in.')
     }
 
-    return response.findUserByGoogleId
+    return response
   }
 
-  async findAuthorizedUser(googleId: string): Promise<UserModel> {
-    const response = await this.gqlClient.request<FindAuthorizedUserModel>(
-      FIND_AUTHORIZED_USER,
-      {googleId},
-    )
+  async findAuthorizedUser(googleId: string): Promise<User> {
+    const {findAuthorizedUser: response} = await this.gqlClient.request<
+      FindAuthorizedUser
+    >(this.userGql.FIND_AUTHORIZED_USER, {
+      googleId,
+    })
 
-    if (!response.findAuthorizedUser) {
+    if (!response) {
       throw new UnauthorizedException('You are not authorized to log in.')
     }
 
-    return response.findAuthorizedUser
+    return response
   }
 }

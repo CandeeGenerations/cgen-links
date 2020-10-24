@@ -1,0 +1,60 @@
+type Link {
+  title: String!
+  destination: String!
+  description: String
+  addedTs: String!
+  active: Boolean!
+  deleted: Boolean!
+  clicks: [Click] @relation
+  owner: User!
+}
+
+type Click {
+  clickedTs: String!
+  ipAddress: String
+  language: String
+  userAgent: String
+  country: String
+  region: String
+  city: String
+  owner: Link!
+}
+
+type Settings {
+  slug: String!
+  logoUrl: String
+  primaryColor: String
+  secondaryColor: String
+  facebook: String
+  instagram: String
+  twitter: String
+  youtube: String
+  owner: User!
+}
+
+type User {
+  googleId: String!
+  email: String!
+  firstName: String!
+  lastName: String!
+  authorized: Boolean!
+  settings: Settings
+  links: [Link] @relation
+}
+
+type Query {
+  findLinksByOwner(owner: ID!): [Link!] @resolver(name: "links_by_owner", paginated: true)
+  findLinksByTitle(owner: ID!, title: String!): [Link] @resolver(name: "links_by_title", paginated: true)
+  findLinksByDestination(owner: ID!, destination: String!): [Link] @resolver(name: "links_by_destination", paginated: true)
+
+  findClicksByOwner(owner: ID!): [Click!] @resolver(name: "clicks_by_owner", paginated: true)
+  clickCountByOwner(owner: ID!): Int @resolver(name: "click_count_by_owner")
+
+  findUserByGoogleId(googleId: String!): User
+  findAuthorizedUser(googleId: String!, authorized: Boolean!): User
+}
+
+type Mutation {
+  toggleActiveLink(id: ID!, active: Boolean!): Link! @resolver(name: "toggle_active_link")
+  softDeleteLink(id: ID!): Link! @resolver(name: "delete_link")
+}

@@ -1,51 +1,54 @@
+import * as dayjs from 'dayjs'
 import {Injectable} from '@nestjs/common'
 import {GraphQLClient} from 'graphql-request'
 
-import {Click} from 'src/models/graphql.schema'
+import GQL from 'src/models/gqlRequests'
 import {getGQLClient} from 'src/api/graphqlRequest'
+import {Click, ClickInput, ClickPage} from 'src/models/graphql.schema'
 import {
-  CREATE_CLICK,
-  FIND_ALL_CLICKS,
-  FIND_ALL_CLICKS_BY_LINK_ID
-} from 'src/models/gqlRequests'
-import {
-  ClickModel,
-  CreateClickModel,
-  FindAllClicksByLinkIdModel,
-  FindAllClicksModel,
-} from 'src/models/models'
+  ClickCountByOwner,
+  CreateClick,
+  FindClicksByOwner,
+} from 'src/models/override.model'
 
 @Injectable()
 export class ClickService {
   private gqlClient: GraphQLClient
+  private clickGql = GQL.CLICK
 
   constructor() {
     this.gqlClient = getGQLClient()
   }
 
-  async findAllClicks(): Promise<[ClickModel]> {
-    const response = await this.gqlClient.request<FindAllClicksModel>(
-      FIND_ALL_CLICKS,
-    )
+  async findAllClicksByOwner(owner: string): Promise<ClickPage> {
+    const {findClicksByOwner: response} = await this.gqlClient.request<
+      FindClicksByOwner
+    >(this.clickGql.FIND_CLICKS_BY_OWNER, {owner})
 
-    return response.findAllClicks.data
+    return response
   }
 
-  async findAllClicksByLinkId(linkId: string): Promise<[ClickModel]> {
-    const response = await this.gqlClient.request<FindAllClicksByLinkIdModel>(
-      FIND_ALL_CLICKS_BY_LINK_ID,
-      {linkId},
+  async createClick(input: ClickInput): Promise<Click> {
+    const {createClick: response} = await this.gqlClient.request<CreateClick>(
+      this.clickGql.CREATE_CLICK,
+      {
+        input: {
+          ...input,
+          clickedTs: dayjs()
+            .valueOf()
+            .toString(),
+        },
+      },
     )
 
-    return response.findAllClicksByLinkId.data
+    return response
   }
 
-  async createClick(input: Click): Promise<ClickModel> {
-    const response = await this.gqlClient.request<CreateClickModel>(
-      CREATE_CLICK,
-      {input},
-    )
+  async clickCountByOwner(owner: string): Promise<number> {
+    const {clickCountByOwner: response} = await this.gqlClient.request<
+      ClickCountByOwner
+    >(this.clickGql.CLICK_COUNT_BY_OWNER, {owner})
 
-    return response.createClick
+    return response
   }
 }

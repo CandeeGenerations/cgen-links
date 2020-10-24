@@ -1,7 +1,7 @@
 import {ConfigService} from '@nestjs/config'
 import {Controller, Get} from '@nestjs/common'
 
-import {ConfigModel} from 'src/models/models'
+import {ConfigModel} from '../models/override.model'
 
 @Controller('api/config')
 export class AppController {
@@ -11,7 +11,6 @@ export class AppController {
   getConfig(): ConfigModel {
     return {
       gClientId: this.configService.get<string>('G_CLIENT_ID'),
-      routingUrl: this.configService.get<string>('ROUTING_URL'),
     }
   }
 }

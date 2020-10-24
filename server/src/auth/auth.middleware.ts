@@ -1,7 +1,7 @@
 import {Injectable, NestMiddleware, UnauthorizedException} from '@nestjs/common'
 
+import {User} from '../models/graphql.schema'
 import {AuthService} from 'src/modules/auth/services/auth.service'
-import {UserModel} from 'src/models/models'
 
 interface Req extends Request {
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -27,7 +27,7 @@ export class AuthMiddleware implements NestMiddleware {
       const authToken = req.headers['x-cgen-auth']
       const buff = Buffer.from(authToken, 'base64')
       const str = buff.toString('utf-8')
-      const authData: UserModel = JSON.parse(str)
+      const authData: User = JSON.parse(str)
 
       await this.authService.findAuthorizedUser(authData.googleId)
 

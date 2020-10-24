@@ -14,11 +14,11 @@ import './app.css'
 
 import Home from '../Home'
 import Links from '../Links'
-import NewLink from '../NewLink'
 import Link from '../Links/Link'
 import Settings from '../Settings'
 import {getConfig} from '../../api'
 import {authTokenKey} from '../../helpers'
+import NewEditLink from '../Links/NewEditLink'
 import {ConfigModel} from '../../models/models'
 
 const {Header, Content, Footer} = Layout
@@ -59,18 +59,14 @@ const App = () => {
             <Header>
               <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['1']}>
                 <Menu.Item key="1">
-                  <RLink to="/new">New Link</RLink>
-                </Menu.Item>
-
-                <Menu.Item key="2">
                   <RLink to="/links">Links</RLink>
                 </Menu.Item>
 
-                <Menu.Item key="3">
+                <Menu.Item key="2">
                   <RLink to="/settings">Settings</RLink>
                 </Menu.Item>
 
-                <Menu.Item key="4" style={{float: 'right'}}>
+                <Menu.Item key="3" style={{float: 'right'}}>
                   <ALink onClick={onLogOut}>Log Out</ALink>
                 </Menu.Item>
               </Menu>
@@ -79,6 +75,22 @@ const App = () => {
 
           <Content style={{padding: loggedIn ? '0 50px' : '50px 50px 0'}}>
             <Switch>
+              <Route
+                path={['/links/new', '/links/edit/:id']}
+                render={({location}) =>
+                  loggedIn ? (
+                    <NewEditLink />
+                  ) : (
+                    <Redirect
+                      to={{
+                        pathname: '/',
+                        state: {from: location},
+                      }}
+                    />
+                  )
+                }
+              />
+
               <Route
                 path="/links/:id"
                 render={({location}) =>
@@ -100,22 +112,6 @@ const App = () => {
                 render={({location}) =>
                   loggedIn ? (
                     <Links />
-                  ) : (
-                    <Redirect
-                      to={{
-                        pathname: '/',
-                        state: {from: location},
-                      }}
-                    />
-                  )
-                }
-              />
-
-              <Route
-                path="/new"
-                render={({location}) =>
-                  loggedIn ? (
-                    <NewLink />
                   ) : (
                     <Redirect
                       to={{
@@ -151,7 +147,7 @@ const App = () => {
                   ) : (
                     <Redirect
                       to={{
-                        pathname: '/new',
+                        pathname: '/links',
                         state: {from: location},
                       }}
                     />

@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 
 import Space from 'antd/es/space'
 import {Link} from 'react-router-dom'
@@ -8,7 +8,6 @@ import Text from 'antd/es/typography/Text'
 import Breadcrumb from 'antd/es/breadcrumb'
 import Table, {ColumnsType} from 'antd/es/table'
 
-import {ConfigContext} from '../App'
 import {findAllLinks} from '../../api'
 import {formatDate} from '../../helpers'
 import Title from '../../components/Title'
@@ -16,7 +15,6 @@ import {LinkModel} from '../../models/models'
 import Container from '../../components/Container'
 
 const Links = () => {
-  const configContext = useContext(ConfigContext)
   const [loading, setLoading] = useState(true)
   const [allLinks, setAllLinks] = useState<LinkModel[]>([])
 
@@ -44,11 +42,14 @@ const Links = () => {
       ellipsis: {
         showTitle: false,
       },
-      render: (description: string) => (
-        <Tooltip placement="topLeft" title={description}>
-          {description}
-        </Tooltip>
-      ),
+      render: (description: string) =>
+        description ? (
+          <Tooltip placement="topLeft" title={description}>
+            {description}
+          </Tooltip>
+        ) : (
+          <em>None</em>
+        ),
     },
     {
       title: 'Clicks',
@@ -90,16 +91,12 @@ const Links = () => {
     <>
       <Container span={20} background={false}>
         <Breadcrumb style={{margin: '16px 0'}}>
-          <Breadcrumb.Item>
-            <Link to="/new">Home</Link>
-          </Breadcrumb.Item>
-
           <Breadcrumb.Item>Links</Breadcrumb.Item>
         </Breadcrumb>
       </Container>
 
       <Container span={20}>
-        <Title>Links</Title>
+        <Title link={{title: 'New Link', to: '/links/new'}}>Links</Title>
 
         {loading ? (
           <Skeleton active />

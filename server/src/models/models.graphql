@@ -1,12 +1,29 @@
-type Link {
-  title: String!
-  destination: String!
-  description: String
-  addedTs: String!
+directive @embedded on OBJECT
+directive @collection(name: String!) on OBJECT
+directive @index(name: String!) on FIELD_DEFINITION
+directive @resolver(
+  name: String
+  paginated: Boolean! = false
+) on FIELD_DEFINITION
+directive @relation(name: String) on FIELD_DEFINITION
+directive @unique(index: String) on FIELD_DEFINITION
+type Click {
+  clickedTs: String!
+  city: String
+  # The document's ID.
+  _id: ID!
+  country: String
+  userAgent: String
+  language: String
+  ipAddress: String
+  region: String
+  owner: Link!
+  # The document's timestamp.
+  _ts: Long!
 }
 
-type Click {
-  linkId: ID!
+# 'Click' input values
+input ClickInput {
   clickedTs: String!
   ipAddress: String
   language: String
@@ -14,10 +31,281 @@ type Click {
   country: String
   region: String
   city: String
+  owner: ClickOwnerRelation
+}
+
+# Allow manipulating the relationship between the types 'Click' and 'Link' using the field 'Click.owner'.
+input ClickOwnerRelation {
+  # Create a document of type 'Link' and associate it with the current document.
+  create: LinkInput
+  # Connect a document of type 'Link' with the current document using its ID.
+  connect: ID
+}
+
+# The pagination object for elements of type 'Click'.
+type ClickPage {
+  # The elements of type 'Click' in this page.
+  data: [Click]!
+  # A cursor for elements coming after the current page.
+  after: String
+  # A cursor for elements coming before the current page.
+  before: String
+}
+
+scalar Date
+
+type Link {
+  description: String
+  # The document's ID.
+  _id: ID!
+  clicks(
+    # The number of items to return per page.
+    _size: Int
+    # The pagination cursor.
+    _cursor: String
+  ): ClickPage!
+  owner: User!
+  title: String!
+  destination: String!
+  addedTs: String!
+  deleted: Boolean!
+  active: Boolean!
+  # The document's timestamp.
+  _ts: Long!
+}
+
+# Allow manipulating the relationship between the types 'Link' and 'Click'.
+input LinkClicksRelation {
+  # Create one or more documents of type 'Click' and associate them with the current document.
+  create: [ClickInput]
+  # Connect one or more documents of type 'Click' with the current document using their IDs.
+  connect: [ID]
+  # Disconnect the given documents of type 'Click' from the current document using their IDs.
+  disconnect: [ID]
+}
+
+# 'Link' input values
+input LinkInput {
+  title: String!
+  destination: String!
+  description: String
+  addedTs: String!
+  active: Boolean!
+  deleted: Boolean!
+  clicks: LinkClicksRelation
+  owner: LinkOwnerRelation
+}
+
+# Allow manipulating the relationship between the types 'Link' and 'User' using the field 'Link.owner'.
+input LinkOwnerRelation {
+  # Create a document of type 'User' and associate it with the current document.
+  create: UserInput
+  # Connect a document of type 'User' with the current document using its ID.
+  connect: ID
+}
+
+# The pagination object for elements of type 'Link'.
+type LinkPage {
+  # The elements of type 'Link' in this page.
+  data: [Link]!
+  # A cursor for elements coming after the current page.
+  after: String
+  # A cursor for elements coming before the current page.
+  before: String
+}
+
+# The `Long` scalar type
+# represents non-fractional signed whole numeric values.
+# Long can represent values between -(2^63) and 2^63 - 1.
+scalar Long
+
+type Mutation {
+  # Update an existing document in the collection of 'User'
+  updateUser(
+    # The 'User' document's ID
+    id: ID!
+    # 'User' input values
+    data: UserInput!
+  ): User
+  # Create a new document in the collection of 'Settings'
+  createSettings(
+    # 'Settings' input values
+    data: SettingsInput!
+  ): Settings!
+  # Create a new document in the collection of 'User'
+  createUser(
+    # 'User' input values
+    data: UserInput!
+  ): User!
+  toggleActiveLink(id: ID!, active: Boolean!): Link!
+  # Update an existing document in the collection of 'Link'
+  updateLink(
+    # The 'Link' document's ID
+    id: ID!
+    # 'Link' input values
+    data: LinkInput!
+  ): Link
+  # Create a new document in the collection of 'Click'
+  createClick(
+    # 'Click' input values
+    data: ClickInput!
+  ): Click!
+  # Create a new document in the collection of 'Link'
+  createLink(
+    # 'Link' input values
+    data: LinkInput!
+  ): Link!
+  # Delete an existing document in the collection of 'Link'
+  deleteLink(
+    # The 'Link' document's ID
+    id: ID!
+  ): Link
+  # Update an existing document in the collection of 'Settings'
+  updateSettings(
+    # The 'Settings' document's ID
+    id: ID!
+    # 'Settings' input values
+    data: SettingsInput!
+  ): Settings
+  softDeleteLink(id: ID!): Link!
+  # Update an existing document in the collection of 'Click'
+  updateClick(
+    # The 'Click' document's ID
+    id: ID!
+    # 'Click' input values
+    data: ClickInput!
+  ): Click
+  # Delete an existing document in the collection of 'User'
+  deleteUser(
+    # The 'User' document's ID
+    id: ID!
+  ): User
+  # Delete an existing document in the collection of 'Click'
+  deleteClick(
+    # The 'Click' document's ID
+    id: ID!
+  ): Click
+  # Delete an existing document in the collection of 'Settings'
+  deleteSettings(
+    # The 'Settings' document's ID
+    id: ID!
+  ): Settings
+}
+
+type Query {
+  findLinksByOwner(
+    # The number of items to return per page.
+    _size: Int
+    # The pagination cursor.
+    _cursor: String
+    owner: ID!
+  ): QueryFindLinksByOwnerPage!
+  findAuthorizedUser(googleId: String!, authorized: Boolean!): User
+  findUserByGoogleId(googleId: String!): User
+  findLinksByTitle(
+    # The number of items to return per page.
+    _size: Int
+    # The pagination cursor.
+    _cursor: String
+    owner: ID!
+    title: String!
+  ): QueryFindLinksByTitlePage!
+  # Find a document from the collection of 'Link' by its id.
+  findLinkByID(
+    # The 'Link' document's ID
+    id: ID!
+  ): Link
+  # Find a document from the collection of 'User' by its id.
+  findUserByID(
+    # The 'User' document's ID
+    id: ID!
+  ): User
+  # Find a document from the collection of 'Click' by its id.
+  findClickByID(
+    # The 'Click' document's ID
+    id: ID!
+  ): Click
+  clickCountByOwner(owner: ID!): Int
+  findClicksByOwner(
+    # The number of items to return per page.
+    _size: Int
+    # The pagination cursor.
+    _cursor: String
+    owner: ID!
+  ): QueryFindClicksByOwnerPage!
+  # Find a document from the collection of 'Settings' by its id.
+  findSettingsByID(
+    # The 'Settings' document's ID
+    id: ID!
+  ): Settings
+  findLinksByDestination(
+    # The number of items to return per page.
+    _size: Int
+    # The pagination cursor.
+    _cursor: String
+    owner: ID!
+    destination: String!
+  ): QueryFindLinksByDestinationPage!
+}
+
+# The pagination object for elements of type 'Click'.
+type QueryFindClicksByOwnerPage {
+  # The elements of type 'Click' in this page.
+  data: [Click]!
+  # A cursor for elements coming after the current page.
+  after: String
+  # A cursor for elements coming before the current page.
+  before: String
+}
+
+# The pagination object for elements of type 'Link'.
+type QueryFindLinksByDestinationPage {
+  # The elements of type 'Link' in this page.
+  data: [Link]!
+  # A cursor for elements coming after the current page.
+  after: String
+  # A cursor for elements coming before the current page.
+  before: String
+}
+
+# The pagination object for elements of type 'Link'.
+type QueryFindLinksByOwnerPage {
+  # The elements of type 'Link' in this page.
+  data: [Link]!
+  # A cursor for elements coming after the current page.
+  after: String
+  # A cursor for elements coming before the current page.
+  before: String
+}
+
+# The pagination object for elements of type 'Link'.
+type QueryFindLinksByTitlePage {
+  # The elements of type 'Link' in this page.
+  data: [Link]!
+  # A cursor for elements coming after the current page.
+  after: String
+  # A cursor for elements coming before the current page.
+  before: String
 }
 
 type Settings {
-  userId: ID!
+  youtube: String
+  # The document's ID.
+  _id: ID!
+  logoUrl: String
+  slug: String!
+  facebook: String
+  secondaryColor: String
+  owner: User!
+  twitter: String
+  instagram: String
+  primaryColor: String
+  # The document's timestamp.
+  _ts: Long!
+}
+
+# 'Settings' input values
+input SettingsInput {
   slug: String!
   logoUrl: String
   primaryColor: String
@@ -26,26 +314,66 @@ type Settings {
   instagram: String
   twitter: String
   youtube: String
+  owner: SettingsOwnerRelation
 }
 
+# Allow manipulating the relationship between the types 'Settings' and 'User' using the field 'Settings.owner'.
+input SettingsOwnerRelation {
+  # Create a document of type 'User' and associate it with the current document.
+  create: UserInput
+  # Connect a document of type 'User' with the current document using its ID.
+  connect: ID
+  # If true, disconnects this document from 'User'
+  disconnect: Boolean
+}
+
+scalar Time
+
 type User {
+  email: String!
+  # The document's ID.
+  _id: ID!
+  authorized: Boolean!
+  lastName: String!
+  links(
+    # The number of items to return per page.
+    _size: Int
+    # The pagination cursor.
+    _cursor: String
+  ): LinkPage!
+  firstName: String!
+  googleId: String!
+  settings: Settings
+  # The document's timestamp.
+  _ts: Long!
+}
+
+# 'User' input values
+input UserInput {
   googleId: String!
   email: String!
   firstName: String!
   lastName: String!
   authorized: Boolean!
+  settings: UserSettingsRelation
+  links: UserLinksRelation
 }
 
-type Query {
-  findAllLinks: [Link]!
-  findLinkByTitle(title: String!): Link
-  findLinkByDestination(destination: String!): Link
-
-  findAllClicks: [Click]!
-  findAllClicksByLinkId(linkId: ID!): [Click]!
-
-  findUserByGoogleId(googleId: String!): User
-  findAuthorizedUser(googleId: String!, authorized: Boolean!): User
-
-  findSettingsByUserId(userId: ID!): Settings
+# Allow manipulating the relationship between the types 'User' and 'Link'.
+input UserLinksRelation {
+  # Create one or more documents of type 'Link' and associate them with the current document.
+  create: [LinkInput]
+  # Connect one or more documents of type 'Link' with the current document using their IDs.
+  connect: [ID]
+  # Disconnect the given documents of type 'Link' from the current document using their IDs.
+  disconnect: [ID]
 }
+
+# Allow manipulating the relationship between the types 'User' and 'Settings' using the field 'User.settings'.
+input UserSettingsRelation {
+  # Create a document of type 'Settings' and associate it with the current document.
+  create: SettingsInput
+  # Connect a document of type 'Settings' with the current document using its ID.
+  connect: ID
+}
+
