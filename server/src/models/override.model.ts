@@ -29,6 +29,10 @@ export interface FindAuthorizedUser {
   findAuthorizedUser: User
 }
 
+export interface FindUserById {
+  findUserByID: User
+}
+
 export interface CreateSettings {
   createSettings: Settings
 }

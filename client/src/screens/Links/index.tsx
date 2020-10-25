@@ -8,11 +8,12 @@ import Text from 'antd/es/typography/Text'
 import Breadcrumb from 'antd/es/breadcrumb'
 import Table, {ColumnsType} from 'antd/es/table'
 
-import {findAllLinks} from '../../api'
-import {formatDate} from '../../helpers'
 import Title from '../../components/Title'
-import {LinkModel} from '../../models/models'
+import {LinkModel} from '../../models/link.model'
 import Container from '../../components/Container'
+import {findLinksByOwner} from '../../api/link.api'
+import {formatDate, getUserData} from '../../helpers'
+import NullableField from '../../components/NullableField'
 
 const Links = () => {
   const [loading, setLoading] = useState(true)
@@ -42,21 +43,24 @@ const Links = () => {
       ellipsis: {
         showTitle: false,
       },
-      render: (description: string) =>
-        description ? (
-          <Tooltip placement="topLeft" title={description}>
-            {description}
-          </Tooltip>
-        ) : (
-          <em>None</em>
-        ),
+      render: (description: string) => (
+        <NullableField
+          value={
+            description && (
+              <Tooltip placement="topLeft" title={description}>
+                {description}
+              </Tooltip>
+            )
+          }
+        />
+      ),
     },
     {
       title: 'Clicks',
-      dataIndex: 'clicks',
-      key: 'clicks',
+      dataIndex: 'clickCount',
+      key: 'clickCount',
       align: 'center',
-      render: (clicks?: number) => clicks || 0,
+      render: (clickCount?: number) => clickCount || 0,
     },
     {
       title: 'Added Date',
@@ -77,9 +81,10 @@ const Links = () => {
   ]
 
   const getLinks = async () => {
-    const response = await findAllLinks()
+    const userData = getUserData()
+    const response = await findLinksByOwner(userData._id)
 
-    setAllLinks(response)
+    setAllLinks(response.data)
     setLoading(false)
   }
 

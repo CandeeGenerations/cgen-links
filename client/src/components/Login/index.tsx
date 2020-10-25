@@ -7,8 +7,8 @@ import GoogleLogin, {
 
 import Title from '../Title'
 import {authTokenKey} from '../../helpers'
-import {findOrCreateUser} from '../../api'
 import {ConfigContext} from '../../screens/App'
+import {findOrCreateUser} from '../../api/auth.api'
 
 export interface LoginProps {
   onLogIn: () => void

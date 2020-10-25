@@ -16,4 +16,9 @@ export class AuthController {
   findAuthorizedUser(@Param('googleId') googleId: string): Promise<User> {
     return this.authService.findAuthorizedUser(googleId)
   }
+
+  @Get('id/:id')
+  findUserById(@Param('id') id: string): Promise<User> {
+    return this.authService.findUserById(id)
+  }
 }

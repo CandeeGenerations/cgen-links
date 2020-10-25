@@ -19,7 +19,7 @@ import Settings from '../Settings'
 import {getConfig} from '../../api'
 import {authTokenKey} from '../../helpers'
 import NewEditLink from '../Links/NewEditLink'
-import {ConfigModel} from '../../models/models'
+import {ConfigModel} from '../../models/config.model'
 
 const {Header, Content, Footer} = Layout
 

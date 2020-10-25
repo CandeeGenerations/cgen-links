@@ -8,10 +8,10 @@ import Breadcrumb from 'antd/es/breadcrumb'
 import {Link as RLink, useParams} from 'react-router-dom'
 
 import Title from '../../components/Title'
+import {Link, LinkInput} from '../../models'
 import Container from '../../components/Container'
-import {authTokenKey, urlRegex} from '../../helpers'
-import {Link, LinkInput, UserModel} from '../../models/models'
-import {createLink, findLinkById, updateLink} from '../../api'
+import {getUserData, urlRegex} from '../../helpers'
+import {createLink, findLinkById, updateLink} from '../../api/link.api'
 
 const NewEditLink = () => {
   const {id} = useParams<{id?: string}>()
@@ -21,9 +21,9 @@ const NewEditLink = () => {
   const [error, setError] = useState('')
   const [userId, setUserId] = useState('')
   const [saved, setSaved] = useState(false)
+  const [link, setLink] = useState<Link | undefined>()
   const [loading, setLoading] = useState(false)
   const [newId, setNewId] = useState<string | undefined>()
-  const [addedTs, setAddedTs] = useState<string | undefined>()
   const [loadingLink, setLoadingLink] = useState(true)
 
   const onFinish = async (values: LinkInput) => {
@@ -31,12 +31,14 @@ const NewEditLink = () => {
     setSaved(false)
     setLoading(true)
 
-    const data: Link = {
-      userId,
-      addedTs,
+    const data: LinkInput = {
+      owner: {connect: userId},
+      addedTs: link?.addedTs as string,
       title: values.title.trim(),
       destination: values.destination.trim(),
       description: values.description?.trim(),
+      active: link?.active || true,
+      deleted: link?.deleted || false,
     }
 
     try {
@@ -60,17 +62,18 @@ const NewEditLink = () => {
   }
 
   const loadLink = async () => {
-    const authToken = localStorage.getItem(authTokenKey)
-    const user: UserModel = JSON.parse(atob(authToken as string))
     const response = await findLinkById(id as string)
 
-    setAddedTs(response.addedTs)
-    setUserId(user._id)
     setLoadingLink(false)
+    setLink(response)
     form.setFieldsValue({...response})
   }
 
   useEffect(() => {
+    const userData = getUserData()
+
+    setUserId(userData._id)
+
     if (id) {
       loadLink()
     } else {

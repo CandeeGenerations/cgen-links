@@ -100,6 +100,20 @@ const GQL = {
       ${FRAGMENTS.USER}
       ${FRAGMENTS.SETTINGS}
     `,
+
+    // Find User By Id
+    FIND_USER_BY_ID: gql`
+      query findUserByID($id: ID!) {
+        findUserByID(id: $id) {
+          ...UserFragments
+          settings {
+            ...SettingsFragments
+          }
+        }
+      }
+      ${FRAGMENTS.USER}
+      ${FRAGMENTS.SETTINGS}
+    `,
   },
 
   // Link

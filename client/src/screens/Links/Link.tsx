@@ -1,20 +1,22 @@
 import React, {useEffect, useState} from 'react'
 import Row from 'antd/es/row'
 import Col from 'antd/es/col'
-import Table from 'antd/es/table'
 import Tooltip from 'antd/es/tooltip'
 import Skeleton from 'antd/es/skeleton'
 import Text from 'antd/es/typography/Text'
 import Breadcrumb from 'antd/es/breadcrumb'
+import Table, {ColumnsType} from 'antd/es/table'
 import {useParams, Link as RLink} from 'react-router-dom'
 
 import {formatDate} from '../../helpers'
 import Title from '../../components/Title'
+import {findLinkById} from '../../api/link.api'
+import {Click, Link as MLink} from '../../models'
 import Container from '../../components/Container'
-import {ClickModel, LinkModel} from '../../models/models'
-import {findAllClicksByLinkId, findLinkById} from '../../api'
+import {findAllClicksByOwner} from '../../api/click.api'
+import NullableField from '../../components/NullableField'
 
-const columns = [
+const columns: ColumnsType<Click> = [
   {
     title: 'Date Clicked',
     dataIndex: 'clickedTs',
@@ -25,11 +27,13 @@ const columns = [
     title: 'IP Address',
     dataIndex: 'ipAddress',
     key: 'ipAddress',
+    render: (text: string) => <NullableField value={text} />,
   },
   {
     title: 'Language',
     dataIndex: 'language',
     key: 'language',
+    render: (text: string) => <NullableField value={text} />,
   },
   {
     title: 'Browser',
@@ -39,15 +43,21 @@ const columns = [
       showTitle: false,
     },
     render: (userAgent: string) => (
-      <Tooltip placement="topLeft" title={userAgent}>
-        {userAgent}
-      </Tooltip>
+      <NullableField
+        value={
+          userAgent && (
+            <Tooltip placement="topLeft" title={userAgent}>
+              {userAgent}
+            </Tooltip>
+          )
+        }
+      />
     ),
   },
   {
     title: 'Location',
     key: 'location',
-    render: (text: string, data: ClickModel) =>
+    render: (text: string, data: Click) =>
       `${data.city || 'Unknown'}, ${data.region || 'Unknown'}, ${data.country ||
         'Unknown'}`,
   },
@@ -57,9 +67,9 @@ const Link = () => {
   const {id} = useParams<{id: string}>()
 
   const [loadingLink, setLoadingLink] = useState(true)
-  const [clicks, setClicks] = useState<ClickModel[]>([])
+  const [clicks, setClicks] = useState<Click[]>([])
   const [loadingClicks, setLoadingClicks] = useState(true)
-  const [link, setLink] = useState<LinkModel | null>(null)
+  const [link, setLink] = useState<MLink | null>(null)
 
   const getShortUrl = async () => {
     const response = await findLinkById(id)
@@ -69,9 +79,9 @@ const Link = () => {
   }
 
   const getClicks = async () => {
-    const response = await findAllClicksByLinkId(id)
+    const response = await findAllClicksByOwner(id)
 
-    setClicks(response)
+    setClicks(response.data)
     setLoadingClicks(false)
   }
 

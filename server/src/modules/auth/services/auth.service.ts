@@ -4,7 +4,11 @@ import {Injectable, UnauthorizedException} from '@nestjs/common'
 import GQL from 'src/models/gqlRequests'
 import {getGQLClient} from 'src/api/graphqlRequest'
 import {User, UserInput} from 'src/models/graphql.schema'
-import {FindAuthorizedUser, FindUserByGoogleId} from 'src/models/override.model'
+import {
+  FindAuthorizedUser,
+  FindUserByGoogleId,
+  FindUserById,
+} from 'src/models/override.model'
 
 @Injectable()
 export class AuthService {
@@ -47,6 +51,15 @@ export class AuthService {
     if (!response) {
       throw new UnauthorizedException('You are not authorized to log in.')
     }
+
+    return response
+  }
+
+  async findUserById(id: string): Promise<User> {
+    const {findUserByID: response} = await this.gqlClient.request<FindUserById>(
+      this.userGql.FIND_USER_BY_ID,
+      {id},
+    )
 
     return response
   }

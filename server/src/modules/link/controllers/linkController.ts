@@ -21,9 +21,7 @@ export class LinkController {
     const links: LinkModel[] = []
 
     await asyncForEach(linksByOwner.data, async link => {
-      const clickCount = await this.clickService.clickCountByOwner(
-        link.owner._id,
-      )
+      const clickCount = await this.clickService.clickCountByOwner(link._id)
 
       links.push({
         ...link,

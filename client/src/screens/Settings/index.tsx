@@ -6,15 +6,15 @@ import Alert from 'antd/es/alert'
 import Input from 'antd/es/input'
 import Button from 'antd/es/button'
 import Skeleton from 'antd/es/skeleton'
-import {SketchPicker} from 'react-color'
 import Typography from 'antd/es/typography'
 
 import Title from '../../components/Title'
+import {SettingsInput} from '../../models'
+import {findUserById} from '../../api/auth.api'
 import Container from '../../components/Container'
-import {authTokenKey, urlRegex} from '../../helpers'
-import {SettingsInput, UserModel} from '../../models/models'
-import {createSettings, findSettingsByUserId, updateSettings} from '../../api'
+import {getUserData, urlRegex} from '../../helpers'
 import ColorPicker from '../../components/ColorPicker'
+import {createSettings, updateSettings} from '../../api/settings.api'
 
 const Settings = () => {
   const [form] = Form.useForm()
@@ -26,16 +26,15 @@ const Settings = () => {
   const [settingsLoading, setSettingsLoading] = useState(true)
 
   const loadSettings = async () => {
-    const authToken = localStorage.getItem(authTokenKey)
-    const user: UserModel = JSON.parse(atob(authToken as string))
-    const response = await findSettingsByUserId(user._id)
+    const userData = getUserData()
+    const response = await findUserById(userData._id)
 
-    if (response) {
-      setSettingsId(response._id)
-      form.setFieldsValue({...response})
+    if (response.settings) {
+      setSettingsId(response.settings._id)
+      form.setFieldsValue({...response.settings})
     }
 
-    setUserId(user._id)
+    setUserId(userData._id)
     setSettingsLoading(false)
   }
 
@@ -47,7 +46,7 @@ const Settings = () => {
     console.log(values)
 
     const data: SettingsInput = {
-      userId,
+      owner: {connect: userId},
       slug: values.slug.trim(),
       logoUrl: values.logoUrl?.trim() || undefined,
       primaryColor: values.primaryColor || undefined,
@@ -117,7 +116,7 @@ const Settings = () => {
                     {required: true, message: 'Please include your slug'},
                   ]}
                 >
-                  <Input />
+                  <Input addonBefore="https://links.cgen.cc/" />
                 </Form.Item>
 
                 <Form.Item
@@ -171,7 +170,7 @@ const Settings = () => {
               </Col>
             </Row>
 
-            <Form.Item style={{textAlign: 'center'}}>
+            <Form.Item>
               <Button type="primary" htmlType="submit" loading={loading}>
                 Save
               </Button>
