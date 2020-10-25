@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import Form from 'antd/es/form'
 import Alert from 'antd/es/alert'
 import Input from 'antd/es/input'
@@ -7,19 +7,22 @@ import Skeleton from 'antd/es/skeleton'
 import Breadcrumb from 'antd/es/breadcrumb'
 import {Link as RLink, useParams} from 'react-router-dom'
 
+import {UserContext} from '../App'
+import {urlRegex} from '../../helpers'
 import Title from '../../components/Title'
-import {Link, LinkInput} from '../../models'
+import {Link, LinkInput, User} from '../../models'
 import Container from '../../components/Container'
-import {getUserData, urlRegex} from '../../helpers'
 import {createLink, findLinkById, updateLink} from '../../api/link.api'
 
 const NewEditLink = () => {
+  const userContext = useContext(UserContext)
+  const user = userContext as User
+
   const {id} = useParams<{id?: string}>()
 
   const [form] = Form.useForm()
 
   const [error, setError] = useState('')
-  const [userId, setUserId] = useState('')
   const [saved, setSaved] = useState(false)
   const [link, setLink] = useState<Link | undefined>()
   const [loading, setLoading] = useState(false)
@@ -32,7 +35,7 @@ const NewEditLink = () => {
     setLoading(true)
 
     const data: LinkInput = {
-      owner: {connect: userId},
+      owner: {connect: user._id},
       addedTs: link?.addedTs as string,
       title: values.title.trim(),
       destination: values.destination.trim(),
@@ -70,10 +73,6 @@ const NewEditLink = () => {
   }
 
   useEffect(() => {
-    const userData = getUserData()
-
-    setUserId(userData._id)
-
     if (id) {
       loadLink()
     } else {

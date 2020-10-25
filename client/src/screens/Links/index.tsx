@@ -1,5 +1,4 @@
-import React, {useEffect, useState} from 'react'
-
+import React, {useContext, useEffect, useState} from 'react'
 import Space from 'antd/es/space'
 import {Link} from 'react-router-dom'
 import Tooltip from 'antd/es/tooltip'
@@ -8,14 +7,18 @@ import Text from 'antd/es/typography/Text'
 import Breadcrumb from 'antd/es/breadcrumb'
 import Table, {ColumnsType} from 'antd/es/table'
 
+import {User} from '../../models'
+import {UserContext} from '../App'
+import {formatDate} from '../../helpers'
 import Title from '../../components/Title'
 import {LinkModel} from '../../models/link.model'
 import Container from '../../components/Container'
 import {findLinksByOwner} from '../../api/link.api'
-import {formatDate, getUserData} from '../../helpers'
 import NullableField from '../../components/NullableField'
 
 const Links = () => {
+  const userContext = useContext(UserContext)
+  const user = userContext as User
   const [loading, setLoading] = useState(true)
   const [allLinks, setAllLinks] = useState<LinkModel[]>([])
 
@@ -81,8 +84,7 @@ const Links = () => {
   ]
 
   const getLinks = async () => {
-    const userData = getUserData()
-    const response = await findLinksByOwner(userData._id)
+    const response = await findLinksByOwner(user._id)
 
     setAllLinks(response.data)
     setLoading(false)

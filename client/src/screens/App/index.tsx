@@ -15,6 +15,7 @@ import './app.css'
 import Home from '../Home'
 import Links from '../Links'
 import Link from '../Links/Link'
+import {User} from '../../models'
 import Settings from '../Settings'
 import {getConfig} from '../../api'
 import {authTokenKey} from '../../helpers'
@@ -23,12 +24,13 @@ import {ConfigModel} from '../../models/config.model'
 
 const {Header, Content, Footer} = Layout
 
+export const UserContext = React.createContext<User | null>(null)
 export const ConfigContext = React.createContext<ConfigModel | null>(null)
 
 const App = () => {
   const [loading, setLoading] = useState(true)
-  const [loggedIn, setLoggedIn] = useState(false)
   const [config, setConfig] = useState<ConfigModel | null>(null)
+  const [user, setUser] = useState<User | null>(null)
 
   const loadConfig = async () => {
     const response = await getConfig()
@@ -37,131 +39,93 @@ const App = () => {
     setLoading(false)
   }
 
+  const getUser = () => {
+    const userData = localStorage.getItem(authTokenKey)
+
+    setUser(userData && JSON.parse(atob(userData as string)))
+  }
+
   useEffect(() => {
-    setLoggedIn(localStorage.getItem(authTokenKey) !== null)
+    getUser()
     loadConfig()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const onLogIn = () => setLoggedIn(true)
+  const onLogIn = () => getUser()
 
   const onLogOut = () => {
     localStorage.removeItem(authTokenKey)
-    setLoggedIn(false)
+    setUser(null)
   }
+
+  const redirect = (Component: any): JSX.Element =>
+    user ? <Component /> : <Redirect to={{pathname: '/'}} />
 
   return loading ? (
     <div style={{padding: 10}}>Loading..</div>
   ) : (
     <ConfigContext.Provider value={config}>
-      <BrowserRouter>
-        <Layout style={{minWidth: 470}}>
-          {loggedIn && (
-            <Header>
-              <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['1']}>
-                <Menu.Item key="1">
-                  <RLink to="/links">Links</RLink>
-                </Menu.Item>
+      <UserContext.Provider value={user}>
+        <BrowserRouter>
+          <Layout style={{minWidth: 470}}>
+            {user && (
+              <Header>
+                <Menu
+                  theme="dark"
+                  mode="horizontal"
+                  defaultSelectedKeys={['1']}
+                >
+                  <Menu.Item key="1">
+                    <RLink to="/links">Links</RLink>
+                  </Menu.Item>
 
-                <Menu.Item key="2">
-                  <RLink to="/settings">Settings</RLink>
-                </Menu.Item>
+                  <Menu.Item key="2">
+                    <RLink to="/settings">Settings</RLink>
+                  </Menu.Item>
 
-                <Menu.Item key="3" style={{float: 'right'}}>
-                  <ALink onClick={onLogOut}>Log Out</ALink>
-                </Menu.Item>
-              </Menu>
-            </Header>
-          )}
+                  <Menu.Item key="3" style={{float: 'right'}}>
+                    <ALink onClick={onLogOut}>Log Out</ALink>
+                  </Menu.Item>
+                </Menu>
+              </Header>
+            )}
 
-          <Content style={{padding: loggedIn ? '0 50px' : '50px 50px 0'}}>
-            <Switch>
-              <Route
-                path={['/links/new', '/links/edit/:id']}
-                render={({location}) =>
-                  loggedIn ? (
-                    <NewEditLink />
-                  ) : (
-                    <Redirect
-                      to={{
-                        pathname: '/',
-                        state: {from: location},
-                      }}
-                    />
-                  )
-                }
-              />
+            <Content style={{padding: user ? '0 50px' : '50px 50px 0'}}>
+              <Switch>
+                <Route
+                  path={['/links/new', '/links/edit/:id']}
+                  render={() => redirect(NewEditLink)}
+                />
 
-              <Route
-                path="/links/:id"
-                render={({location}) =>
-                  loggedIn ? (
-                    <Link />
-                  ) : (
-                    <Redirect
-                      to={{
-                        pathname: '/',
-                        state: {from: location},
-                      }}
-                    />
-                  )
-                }
-              />
+                <Route path="/links/:id" render={() => redirect(Link)} />
 
-              <Route
-                path="/links"
-                render={({location}) =>
-                  loggedIn ? (
-                    <Links />
-                  ) : (
-                    <Redirect
-                      to={{
-                        pathname: '/',
-                        state: {from: location},
-                      }}
-                    />
-                  )
-                }
-              />
+                <Route path="/links" render={() => redirect(Links)} />
 
-              <Route
-                path="/settings"
-                render={({location}) =>
-                  loggedIn ? (
-                    <Settings />
-                  ) : (
-                    <Redirect
-                      to={{
-                        pathname: '/',
-                        state: {from: location},
-                      }}
-                    />
-                  )
-                }
-              />
+                <Route path="/settings" render={() => redirect(Settings)} />
 
-              <Route
-                path="/"
-                render={({location}) =>
-                  !loggedIn ? (
-                    <Home onLogIn={onLogIn} />
-                  ) : (
-                    <Redirect
-                      to={{
-                        pathname: '/links',
-                        state: {from: location},
-                      }}
-                    />
-                  )
-                }
-              />
-            </Switch>
-          </Content>
+                <Route
+                  path="/"
+                  render={({location}) =>
+                    !user ? (
+                      <Home onLogIn={onLogIn} />
+                    ) : (
+                      <Redirect
+                        to={{
+                          pathname: '/links',
+                          state: {from: location},
+                        }}
+                      />
+                    )
+                  }
+                />
+              </Switch>
+            </Content>
 
-          <Footer style={{textAlign: 'center'}}>
-            Candee Generations &copy; {new Date().getFullYear()}
-          </Footer>
-        </Layout>
-      </BrowserRouter>
+            <Footer style={{textAlign: 'center'}}>
+              Candee Generations &copy; {new Date().getFullYear()}
+            </Footer>
+          </Layout>
+        </BrowserRouter>
+      </UserContext.Provider>
     </ConfigContext.Provider>
   )
 }

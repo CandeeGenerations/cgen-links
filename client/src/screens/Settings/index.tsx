@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import Row from 'antd/es/row'
 import Col from 'antd/es/col'
 import Form from 'antd/es/form'
@@ -8,33 +8,35 @@ import Button from 'antd/es/button'
 import Skeleton from 'antd/es/skeleton'
 import Typography from 'antd/es/typography'
 
+import {UserContext} from '../App'
+import {urlRegex} from '../../helpers'
 import Title from '../../components/Title'
-import {SettingsInput} from '../../models'
+import {SettingsInput, User} from '../../models'
 import {findUserById} from '../../api/auth.api'
 import Container from '../../components/Container'
-import {getUserData, urlRegex} from '../../helpers'
 import ColorPicker from '../../components/ColorPicker'
 import {createSettings, updateSettings} from '../../api/settings.api'
 
 const Settings = () => {
+  const userContext = useContext(UserContext)
+  const user = userContext as User
+
   const [form] = Form.useForm()
+
   const [error, setError] = useState('')
-  const [userId, setUserId] = useState('')
   const [saved, setSaved] = useState(false)
   const [loading, setLoading] = useState(false)
   const [settingsId, setSettingsId] = useState<string | undefined>()
   const [settingsLoading, setSettingsLoading] = useState(true)
 
   const loadSettings = async () => {
-    const userData = getUserData()
-    const response = await findUserById(userData._id)
+    const response = await findUserById(user._id)
 
     if (response.settings) {
       setSettingsId(response.settings._id)
       form.setFieldsValue({...response.settings})
     }
 
-    setUserId(userData._id)
     setSettingsLoading(false)
   }
 
@@ -46,7 +48,7 @@ const Settings = () => {
     console.log(values)
 
     const data: SettingsInput = {
-      owner: {connect: userId},
+      owner: {connect: user._id},
       slug: values.slug.trim(),
       logoUrl: values.logoUrl?.trim() || undefined,
       primaryColor: values.primaryColor || undefined,
