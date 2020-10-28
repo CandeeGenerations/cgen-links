@@ -23,15 +23,23 @@ jobs:
         - run: |
             docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/cgenlinks:${{ github.sha }}
             docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/cgenlinks:${{ github.sha }}
-
-        - name: 'Deploy to Azure Container Instances'
-          uses: 'azure/aci-deploy@v1'
+       
+        - uses: azure/webapps-deploy@v2
           with:
-            resource-group: ${{ secrets.RESOURCE_GROUP }}
-            dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
-            image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/cgenlinks:${{ github.sha }}
-            registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-            registry-username: ${{ secrets.REGISTRY_USERNAME }}
-            registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-            name: cgen-links
-            location: 'east us'
+            app-name: 'cgen-links'
+            images: ${{ secrets.REGISTRY_LOGIN_SERVER }}/cgenlinks:${{ github.sha }}
+
+        - name: Azure logout
+          run: |
+            az logout
+#         - name: 'Deploy to Azure Container Instances'
+#           uses: 'azure/aci-deploy@v1'
+#           with:
+#             resource-group: ${{ secrets.RESOURCE_GROUP }}
+#             dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
+#             image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/cgenlinks:${{ github.sha }}
+#             registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+#             registry-username: ${{ secrets.REGISTRY_USERNAME }}
+#             registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+#             name: cgen-links
+#             location: 'east us'
