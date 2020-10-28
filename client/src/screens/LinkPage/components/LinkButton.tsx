@@ -1,11 +1,14 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
-import {useContext} from 'react'
+import AButton from 'antd/es/button'
 import styled from '@emotion/styled'
+import {useContext, useState} from 'react'
 
+import {ConfigContext} from '../../App'
 import {LinkPageContext} from '../index'
+import {createClick} from '../../../api/click.api'
+import {ClickInput, Link, Settings} from '../../../models'
 import {colorForHover, hexToRgba} from '../../../helpers'
-import {Link, Settings} from '../../../models'
 
 export interface LinkButtonProps {
   link: Link
@@ -16,17 +19,56 @@ const LinkButton = (props: LinkButtonProps) => {
   const {
     colors: {button},
   } = useContext(LinkPageContext)
+  const configContext = useContext(ConfigContext)
+
+  const [loading, setLoading] = useState(false)
+
+  const handleClick = async () => {
+    window.open(props.link.destination, '_target')
+
+    setLoading(true)
+
+    const clickData: ClickInput = {
+      userAgent: navigator.userAgent,
+      language: navigator.language,
+      clickedTs: '',
+      owner: {
+        connect: props.link._id,
+      },
+    }
+
+    if (configContext && configContext?.ipUrl) {
+      const ipResponse = await fetch(configContext?.ipUrl)
+
+      if (ipResponse.ok) {
+        const result = await ipResponse.json()
+
+        const locationData = {
+          ipAddress: result.ip_address,
+          country: result.country,
+          region: result.region,
+          city: result.city,
+        }
+
+        await createClick({...clickData, ...locationData})
+      }
+    } else {
+      await createClick(clickData)
+    }
+
+    setLoading(false)
+  }
 
   return (
     <Button
-      href={props.link.destination}
-      target="_blank"
+      onClick={handleClick}
+      loading={loading}
       css={{
         color: `${button.textColor} !important`,
         backgroundColor: button.backgroundColor,
         boxShadow: `0 0 30px ${hexToRgba(button.backgroundColor, 0.5)}`,
 
-        '&:hover': {
+        '&:hover, &:active, &:focus': {
           backgroundColor: colorForHover(button.backgroundColor),
         },
       }}
@@ -36,9 +78,9 @@ const LinkButton = (props: LinkButtonProps) => {
   )
 }
 
-const Button = styled.a`
+const Button = styled(AButton)`
   width: 100%;
-  padding: 1rem;
+  padding: 1rem !important;
   display: block;
   font-size: 0.75rem;
   text-align: center;
@@ -46,6 +88,7 @@ const Button = styled.a`
   border-radius: 0.5rem;
   font-size: 16px;
   transition: all ease 0.5s;
+  height: auto;
 `
 
 export default LinkButton

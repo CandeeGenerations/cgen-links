@@ -11,6 +11,9 @@ export class AppController {
   getConfig(): ConfigModel {
     return {
       gClientId: this.configService.get<string>('G_CLIENT_ID'),
+      ipUrl: `${this.configService.get<string>(
+        'IP_URL',
+      )}?auth=${this.configService.get<string>('IP_KEY')}`,
     }
   }
 }

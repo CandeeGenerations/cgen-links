@@ -9,6 +9,7 @@ import {
 
 export interface ConfigModel {
   gClientId: string
+  ipUrl: string
 }
 
 export interface LinkModel extends Link {
