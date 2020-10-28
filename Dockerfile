@@ -64,5 +64,5 @@ COPY --from=stage-server /usr/src/server .
 COPY --from=stage-client /usr/src/client/build ./dist/client
 
 # Start the server
-EXPOSE 3011
+EXPOSE 3012
 CMD [ "node", "dist/main.js" ]
