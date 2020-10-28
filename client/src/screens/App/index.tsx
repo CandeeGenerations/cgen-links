@@ -1,13 +1,17 @@
-import React, {useEffect, useState} from 'react'
+/** @jsx jsx */
+import {jsx} from '@emotion/core'
 import Menu from 'antd/es/menu'
+import Spin from 'antd/es/spin'
 import Layout from 'antd/es/layout'
 import ALink from 'antd/es/typography/Link'
+import React, {useEffect, useState} from 'react'
 import {
   Switch,
   Route,
   Link as RLink,
   BrowserRouter,
   Redirect,
+  useHistory,
 } from 'react-router-dom'
 
 import './app.css'
@@ -17,17 +21,21 @@ import Links from '../Links'
 import Link from '../Links/Link'
 import {User} from '../../models'
 import Settings from '../Settings'
+import LinkPage from '../LinkPage'
 import {getConfig} from '../../api'
 import {authTokenKey} from '../../helpers'
 import NewEditLink from '../Links/NewEditLink'
 import {ConfigModel} from '../../models/config.model'
+import Copyright from '../../components/Copyright'
 
-const {Header, Content, Footer} = Layout
+const {Header, Content} = Layout
 
 export const UserContext = React.createContext<User | null>(null)
 export const ConfigContext = React.createContext<ConfigModel | null>(null)
 
 const App = () => {
+  const history = useHistory()
+
   const [loading, setLoading] = useState(true)
   const [config, setConfig] = useState<ConfigModel | null>(null)
   const [user, setUser] = useState<User | null>(null)
@@ -50,80 +58,79 @@ const App = () => {
     loadConfig()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const onLogIn = () => getUser()
+  const onLogIn = () => {
+    getUser()
+    history.push('/links')
+  }
 
   const onLogOut = () => {
     localStorage.removeItem(authTokenKey)
     setUser(null)
   }
 
-  const redirect = (Component: any): JSX.Element =>
-    user ? <Component /> : <Redirect to={{pathname: '/'}} />
+  const redirect = (Component: any): JSX.Element => (
+    <Layout style={{minWidth: 470}}>
+      {user && (
+        <Header>
+          <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['1']}>
+            <Menu.Item key="1">
+              <RLink to="/links">Links</RLink>
+            </Menu.Item>
+
+            <Menu.Item key="2">
+              <RLink to="/settings">Settings</RLink>
+            </Menu.Item>
+
+            <Menu.Item key="3" style={{float: 'right'}}>
+              <ALink onClick={onLogOut}>Log Out</ALink>
+            </Menu.Item>
+          </Menu>
+        </Header>
+      )}
+
+      <Content style={{padding: user ? '0 50px' : '50px 50px 0'}}>
+        {user ? <Component /> : <Redirect to={{pathname: '/'}} />}
+      </Content>
+
+      <Copyright />
+    </Layout>
+  )
 
   return loading ? (
-    <div style={{padding: 10}}>Loading..</div>
+    <div css={{padding: 50, textAlign: 'center'}}>
+      <Spin size="large" />
+    </div>
   ) : (
     <ConfigContext.Provider value={config}>
       <UserContext.Provider value={user}>
         <BrowserRouter>
-          <Layout style={{minWidth: 470}}>
-            {user && (
-              <Header>
-                <Menu
-                  theme="dark"
-                  mode="horizontal"
-                  defaultSelectedKeys={['1']}
-                >
-                  <Menu.Item key="1">
-                    <RLink to="/links">Links</RLink>
-                  </Menu.Item>
+          <Switch>
+            <Route
+              path={['/links/new', '/links/edit/:id']}
+              render={() => redirect(NewEditLink)}
+            />
 
-                  <Menu.Item key="2">
-                    <RLink to="/settings">Settings</RLink>
-                  </Menu.Item>
+            <Route path="/links/:id" render={() => redirect(Link)} />
 
-                  <Menu.Item key="3" style={{float: 'right'}}>
-                    <ALink onClick={onLogOut}>Log Out</ALink>
-                  </Menu.Item>
-                </Menu>
-              </Header>
-            )}
+            <Route path="/links" render={() => redirect(Links)} />
 
-            <Content style={{padding: user ? '0 50px' : '50px 50px 0'}}>
-              <Switch>
-                <Route
-                  path={['/links/new', '/links/edit/:id']}
-                  render={() => redirect(NewEditLink)}
-                />
+            <Route path="/settings" render={() => redirect(Settings)} />
 
-                <Route path="/links/:id" render={() => redirect(Link)} />
+            <Route path="/:slug">
+              <LinkPage />
+            </Route>
 
-                <Route path="/links" render={() => redirect(Links)} />
-
-                <Route path="/settings" render={() => redirect(Settings)} />
-
-                <Route
-                  path="/"
-                  render={({location}) =>
-                    !user ? (
-                      <Home onLogIn={onLogIn} />
-                    ) : (
-                      <Redirect
-                        to={{
-                          pathname: '/links',
-                          state: {from: location},
-                        }}
-                      />
-                    )
-                  }
-                />
-              </Switch>
-            </Content>
-
-            <Footer style={{textAlign: 'center'}}>
-              Candee Generations &copy; {new Date().getFullYear()}
-            </Footer>
-          </Layout>
+            <Route
+              path="/"
+              render={() =>
+                !user ? (
+                  <Home onLogIn={onLogIn} />
+                ) : (
+                  <Redirect to={{pathname: '/links'}} />
+                )
+              }
+            />
+          </Switch>
         </BrowserRouter>
       </UserContext.Provider>
     </ConfigContext.Provider>

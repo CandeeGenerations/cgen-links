@@ -194,21 +194,28 @@ type Mutation {
 
 type Query {
   findLinksByOwner(
+    owner: ID!
     # The number of items to return per page.
     _size: Int
     # The pagination cursor.
     _cursor: String
-    owner: ID!
   ): QueryFindLinksByOwnerPage!
   findAuthorizedUser(googleId: String!, authorized: Boolean!): User
-  findUserByGoogleId(googleId: String!): User
-  findLinksByTitle(
+  findActiveLinksByOwner(
+    owner: ID!
     # The number of items to return per page.
     _size: Int
     # The pagination cursor.
     _cursor: String
+  ): QueryFindActiveLinksByOwnerPage!
+  findUserByGoogleId(googleId: String!): User
+  findLinksByTitle(
     owner: ID!
     title: String!
+    # The number of items to return per page.
+    _size: Int
+    # The pagination cursor.
+    _cursor: String
   ): QueryFindLinksByTitlePage!
   # Find a document from the collection of 'Link' by its id.
   findLinkByID(
@@ -220,6 +227,7 @@ type Query {
     # The 'User' document's ID
     id: ID!
   ): User
+  findSettingsBySlug(slug: String!): Settings
   # Find a document from the collection of 'Click' by its id.
   findClickByID(
     # The 'Click' document's ID
@@ -227,11 +235,11 @@ type Query {
   ): Click
   clickCountByOwner(owner: ID!): Int
   findClicksByOwner(
+    owner: ID!
     # The number of items to return per page.
     _size: Int
     # The pagination cursor.
     _cursor: String
-    owner: ID!
   ): QueryFindClicksByOwnerPage!
   # Find a document from the collection of 'Settings' by its id.
   findSettingsByID(
@@ -239,13 +247,23 @@ type Query {
     id: ID!
   ): Settings
   findLinksByDestination(
+    owner: ID!
+    destination: String!
     # The number of items to return per page.
     _size: Int
     # The pagination cursor.
     _cursor: String
-    owner: ID!
-    destination: String!
   ): QueryFindLinksByDestinationPage!
+}
+
+# The pagination object for elements of type 'Link'.
+type QueryFindActiveLinksByOwnerPage {
+  # The elements of type 'Link' in this page.
+  data: [Link]!
+  # A cursor for elements coming after the current page.
+  after: String
+  # A cursor for elements coming before the current page.
+  before: String
 }
 
 # The pagination object for elements of type 'Click'.
@@ -289,6 +307,7 @@ type QueryFindLinksByTitlePage {
 }
 
 type Settings {
+  useGradient: Boolean
   youtube: String
   # The document's ID.
   _id: ID!
@@ -310,6 +329,7 @@ input SettingsInput {
   logoUrl: String
   primaryColor: String
   secondaryColor: String
+  useGradient: Boolean
   facebook: String
   instagram: String
   twitter: String

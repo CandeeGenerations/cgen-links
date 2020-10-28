@@ -17,7 +17,8 @@ export class AuthMiddleware implements NestMiddleware {
     if (
       !req.baseUrl.includes('api') ||
       req.baseUrl.includes('auth') ||
-      req.baseUrl.includes('config')
+      req.baseUrl.includes('config') ||
+      req.baseUrl.includes('public')
     ) {
       next()
       return

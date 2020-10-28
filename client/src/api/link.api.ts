@@ -16,6 +16,14 @@ export const findLinksByOwner = async (
   return handleErrors(response)
 }
 
+export const findActiveLinksByOwner = async (
+  owner: string,
+): Promise<LinkPageModel> => {
+  const response = await get<LinkPageModel>({url: `link/public/${owner}`})
+
+  return handleErrors(response)
+}
+
 export const createLink = async (input: LinkInput): Promise<Link> => {
   const response = await post<Link>({url: 'link', data: {...input}})
 

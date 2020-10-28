@@ -25,6 +25,7 @@ type Settings {
   logoUrl: String
   primaryColor: String
   secondaryColor: String
+  useGradient: Boolean
   facebook: String
   instagram: String
   twitter: String
@@ -44,17 +45,20 @@ type User {
 
 type Query {
   findLinksByOwner(owner: ID!): [Link!] @resolver(name: "links_by_owner", paginated: true)
+  findActiveLinksByOwner(owner: ID!): [Link!] @resolver(name: "active_links_by_owner", paginated: true)
   findLinksByTitle(owner: ID!, title: String!): [Link] @resolver(name: "links_by_title", paginated: true)
   findLinksByDestination(owner: ID!, destination: String!): [Link] @resolver(name: "links_by_destination", paginated: true)
 
-  findClicksByOwner(owner: ID!): [Click!] @resolver(name: "clicks_by_owner", paginated: true)
   clickCountByOwner(owner: ID!): Int @resolver(name: "click_count_by_owner")
+  findClicksByOwner(owner: ID!): [Click!] @resolver(name: "clicks_by_owner", paginated: true)
 
   findUserByGoogleId(googleId: String!): User
   findAuthorizedUser(googleId: String!, authorized: Boolean!): User
+
+  findSettingsBySlug(slug: String!): Settings
 }
 
 type Mutation {
-  toggleActiveLink(id: ID!, active: Boolean!): Link! @resolver(name: "toggle_active_link")
   softDeleteLink(id: ID!): Link! @resolver(name: "delete_link")
+  toggleActiveLink(id: ID!, active: Boolean!): Link! @resolver(name: "toggle_active_link")
 }

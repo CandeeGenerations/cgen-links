@@ -52,6 +52,7 @@ const FRAGMENTS = {
       logoUrl
       primaryColor
       secondaryColor
+      useGradient
       facebook
       instagram
       twitter
@@ -196,6 +197,21 @@ const GQL = {
       ${FRAGMENTS.LINK}
     `,
 
+    // Find Active Links By Owner
+    FIND_ACTIVE_LINKS_BY_OWNER: gql`
+      query findActiveLinksByOwner($owner: ID!) {
+        findActiveLinksByOwner(owner: $owner) {
+          data {
+            ...LinkFragments
+            owner {
+              _id
+            }
+          }
+        }
+      }
+      ${FRAGMENTS.LINK}
+    `,
+
     // Find Links By Title
     FIND_LINKS_BY_TITLE: gql`
       query findLinksByTitle($owner: ID!, $title: String!) {
@@ -259,6 +275,19 @@ const GQL = {
 
   // Settings
   SETTINGS: {
+    // Find Settings By Slug
+    FIND_SETTINGS_BY_SLUG: gql`
+      query findSettingsBySlug($slug: String!) {
+        findSettingsBySlug(slug: $slug) {
+          ...SettingsFragments
+          owner {
+            _id
+          }
+        }
+      }
+      ${FRAGMENTS.SETTINGS}
+    `,
+
     // Create Settings
     CREATE_SETTINGS: gql`
       mutation createSettings($input: SettingsInput!) {

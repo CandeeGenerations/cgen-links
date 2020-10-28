@@ -52,8 +52,8 @@ const Login = (props: LoginProps) => {
         <GoogleLogin
           clientId={configContext?.gClientId || ''}
           buttonText="Login with Google"
-          onSuccess={responseGoogle}
-          onFailure={responseGoogle}
+          onSuccess={r => responseGoogle(r)}
+          onFailure={r => responseGoogle(r)}
           cookiePolicy={'single_host_origin'}
           onRequest={() => setError('')}
         />

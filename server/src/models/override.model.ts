@@ -33,6 +33,10 @@ export interface FindUserById {
   findUserByID: User
 }
 
+export interface FindSettingsBySlug {
+  findSettingsBySlug: Settings
+}
+
 export interface CreateSettings {
   createSettings: Settings
 }
@@ -47,6 +51,10 @@ export interface FindLinkByID {
 
 export interface FindLinksByOwner {
   findLinksByOwner: LinkPage
+}
+
+export interface FindActiveLinksByOwner {
+  findActiveLinksByOwner: LinkPage
 }
 
 export interface FindLinksByTitle {

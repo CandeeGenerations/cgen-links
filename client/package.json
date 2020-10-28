@@ -6,6 +6,9 @@
   "private": true,
   "license": "UNLICENSED",
   "dependencies": {
+    "@ant-design/icons": "^4.2.2",
+    "@emotion/core": "^10.0.35",
+    "@emotion/styled": "^10.0.27",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
@@ -20,8 +23,10 @@
     "react-color": "^2.18.1",
     "react-dom": "^16.13.1",
     "react-google-login": "^5.1.21",
+    "react-helmet": "^6.1.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
+    "tinycolor2": "^1.4.2",
     "typescript": "~3.7.2"
   },
   "scripts": {
@@ -49,6 +54,8 @@
   "devDependencies": {
     "@types/axios": "^0.14.0",
     "@types/react-color": "^3.0.4",
-    "@types/react-router-dom": "^5.1.5"
+    "@types/react-helmet": "^6.1.0",
+    "@types/react-router-dom": "^5.1.5",
+    "@types/tinycolor2": "^1.4.2"
   }
 }

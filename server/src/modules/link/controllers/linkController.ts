@@ -41,6 +41,23 @@ export class LinkController {
     }
   }
 
+  @Get('public/:owner')
+  async findActiveLinksByOwner(
+    @Param('owner') owner: string,
+  ): Promise<LinkPage> {
+    const linksByOwner = await this.linkService.findActiveLinksByOwner(owner)
+    const sortedLinks = linksByOwner.data.sort(
+      (a, b) => Number(b.addedTs) - Number(a.addedTs),
+    )
+
+    delete linksByOwner.data
+
+    return {
+      ...linksByOwner,
+      data: sortedLinks,
+    }
+  }
+
   @Get('id/:id')
   findLinkById(@Param('id') id: string): Promise<Link> {
     return this.linkService.findLinkById(id)

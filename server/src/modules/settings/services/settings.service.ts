@@ -4,7 +4,11 @@ import {GraphQLClient} from 'graphql-request'
 import GQL from 'src/models/gqlRequests'
 import {getGQLClient} from 'src/api/graphqlRequest'
 import {Settings, SettingsInput} from 'src/models/graphql.schema'
-import {CreateSettings, UpdateSettings} from 'src/models/override.model'
+import {
+  CreateSettings,
+  FindSettingsBySlug,
+  UpdateSettings,
+} from 'src/models/override.model'
 
 @Injectable()
 export class SettingsService {
@@ -13,6 +17,14 @@ export class SettingsService {
 
   constructor() {
     this.gqlClient = getGQLClient()
+  }
+
+  async findSettingsBySlug(slug: string): Promise<Settings> {
+    const {findSettingsBySlug: response} = await this.gqlClient.request<
+      FindSettingsBySlug
+    >(this.settingsGql.FIND_SETTINGS_BY_SLUG, {slug})
+
+    return response
   }
 
   async createSettings(input: SettingsInput): Promise<Settings> {

@@ -7,6 +7,11 @@ import {SettingsService} from '../services/settings.service'
 export class SettingsController {
   constructor(private readonly settingsService: SettingsService) {}
 
+  @Get('public/:slug')
+  findSettingsBySlug(@Param('slug') slug: string): Promise<Settings> {
+    return this.settingsService.findSettingsBySlug(slug)
+  }
+
   @Post()
   createSettings(@Body() input: SettingsInput): Promise<Settings> {
     return this.settingsService.createSettings(input)

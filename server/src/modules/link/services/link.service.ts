@@ -7,6 +7,7 @@ import {getGQLClient} from 'src/api/graphqlRequest'
 import {Link, LinkInput, LinkPage} from 'src/models/graphql.schema'
 import {
   CreateLink,
+  FindActiveLinksByOwner,
   FindLinkByID,
   FindLinksByDestination,
   FindLinksByOwner,
@@ -40,6 +41,16 @@ export class LinkService {
     const {findLinksByOwner: response} = await this.gqlClient.request<
       FindLinksByOwner
     >(this.linkGql.FIND_LINKS_BY_OWNER, {
+      owner,
+    })
+
+    return response
+  }
+
+  async findActiveLinksByOwner(owner: string): Promise<LinkPage> {
+    const {findActiveLinksByOwner: response} = await this.gqlClient.request<
+      FindActiveLinksByOwner
+    >(this.linkGql.FIND_ACTIVE_LINKS_BY_OWNER, {
       owner,
     })
 

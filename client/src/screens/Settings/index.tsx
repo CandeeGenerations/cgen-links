@@ -6,6 +6,7 @@ import Alert from 'antd/es/alert'
 import Input from 'antd/es/input'
 import Button from 'antd/es/button'
 import Skeleton from 'antd/es/skeleton'
+import Checkbox from 'antd/es/checkbox'
 import Typography from 'antd/es/typography'
 
 import {UserContext} from '../App'
@@ -45,18 +46,17 @@ const Settings = () => {
     setLoading(true)
     setSaved(false)
 
-    console.log(values)
-
     const data: SettingsInput = {
       owner: {connect: user._id},
       slug: values.slug.trim(),
-      logoUrl: values.logoUrl?.trim() || undefined,
-      primaryColor: values.primaryColor || undefined,
-      secondaryColor: values.secondaryColor || undefined,
-      facebook: values.facebook?.trim() || undefined,
-      instagram: values.instagram?.trim() || undefined,
-      twitter: values.twitter?.trim() || undefined,
-      youtube: values.youtube?.trim() || undefined,
+      logoUrl: values.logoUrl?.trim() || '',
+      primaryColor: values.primaryColor || '',
+      secondaryColor: values.secondaryColor || '',
+      useGradient: values.useGradient || false,
+      facebook: values.facebook?.trim() || '',
+      instagram: values.instagram?.trim() || '',
+      twitter: values.twitter?.trim() || '',
+      youtube: values.youtube?.trim() || '',
     }
 
     try {
@@ -135,6 +135,10 @@ const Settings = () => {
                 </Form.Item>
 
                 <Typography.Title level={4}>Colors</Typography.Title>
+
+                <Form.Item name="useGradient" valuePropName="checked">
+                  <Checkbox>Use Gradient</Checkbox>
+                </Form.Item>
 
                 <Row gutter={[16, {md: 16, sm: 24, xs: 24}]}>
                   <Col md={12} sm={24} xs={24}>
