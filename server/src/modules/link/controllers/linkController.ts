@@ -1,6 +1,6 @@
 import {Body, Controller, Get, Param, Post, Put, Query} from '@nestjs/common'
 
-import {asyncForEach} from 'src/helpers'
+import {asyncForEach, sortLinks} from 'src/helpers'
 import {LinkService} from '../services/link.service'
 import {LinkModel, LinkPageModel} from 'src/models/override.model'
 import {Link, LinkInput, LinkPage} from 'src/models/graphql.schema'
@@ -29,9 +29,7 @@ export class LinkController {
       })
     })
 
-    const sortedLinks = links.sort(
-      (a, b) => Number(b.addedTs) - Number(a.addedTs),
-    )
+    const sortedLinks = links.sort(sortLinks)
 
     delete linksByOwner.data
 
@@ -46,9 +44,7 @@ export class LinkController {
     @Param('owner') owner: string,
   ): Promise<LinkPage> {
     const linksByOwner = await this.linkService.findActiveLinksByOwner(owner)
-    const sortedLinks = linksByOwner.data.sort(
-      (a, b) => Number(b.addedTs) - Number(a.addedTs),
-    )
+    const sortedLinks = linksByOwner.data.sort(sortLinks)
 
     delete linksByOwner.data
 
