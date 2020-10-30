@@ -7,6 +7,11 @@ import {
   User,
 } from './graphql.schema'
 
+export interface ReorderModel {
+  ids: string[]
+  owner: string
+}
+
 export interface ConfigModel {
   gClientId: string
   ipUrl: string

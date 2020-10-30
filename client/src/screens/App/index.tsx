@@ -14,8 +14,6 @@ import {
   useHistory,
 } from 'react-router-dom'
 
-import './app.css'
-
 import Home from '../Home'
 import Links from '../Links'
 import Link from '../Links/Link'
@@ -69,7 +67,7 @@ const App = () => {
   }
 
   const redirect = (Component: any): JSX.Element => (
-    <Layout style={{minWidth: 470}}>
+    <Layout>
       {user && (
         <Header>
           <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['1']}>
