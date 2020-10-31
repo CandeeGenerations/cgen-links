@@ -1,6 +1,5 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
-import AButton from 'antd/es/button'
 import styled from '@emotion/styled'
 import {useContext, useState} from 'react'
 
@@ -9,6 +8,7 @@ import {LinkPageContext} from '../index'
 import {createClick} from '../../../api/click.api'
 import {ClickInput, Link, Settings} from '../../../models'
 import {colorForHover, hexToRgba} from '../../../helpers'
+import AButton from '../../../components/Button'
 
 export interface LinkButtonProps {
   link: Link
@@ -82,10 +82,8 @@ const Button = styled(AButton)`
   width: 100%;
   padding: 1rem !important;
   display: block;
-  font-size: 0.75rem;
   text-align: center;
   margin-bottom: 30px;
-  border-radius: 0.5rem;
   font-size: 16px;
   transition: all ease 0.5s;
   height: auto;

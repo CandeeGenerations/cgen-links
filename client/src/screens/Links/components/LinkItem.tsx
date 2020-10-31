@@ -3,7 +3,6 @@ import {jsx, css} from '@emotion/core'
 import styled from '@emotion/styled'
 import Typography from 'antd/es/typography'
 import {MenuOutlined} from '@ant-design/icons'
-import {Link} from 'react-router-dom'
 import {useRef} from 'react'
 import {useDrag, useDrop, DropTargetMonitor} from 'react-dnd'
 import {XYCoord} from 'dnd-core'
@@ -15,6 +14,7 @@ export interface LinkItemProps {
   index: number
   link: LinkModel
   moveLink: (dragIndex: number, hoverIndex: number) => void
+  editLink: () => void
 }
 
 interface DragItem {
@@ -95,8 +95,8 @@ const LinkItem = (props: LinkItemProps) => {
         </Paragraph>
       </Wrapper>
 
-      <LinkButton type="primary" block size="large">
-        <Link to={`/links/${props.link._id}`}>View Link</Link>
+      <LinkButton type="primary" block size="large" onClick={props.editLink}>
+        View Link
       </LinkButton>
     </Container>
   )

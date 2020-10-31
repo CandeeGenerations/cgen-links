@@ -11,12 +11,16 @@ export interface ButtonProps extends BProps {
 
 const Button = ({
   className,
+  size,
   ...props
 }: ButtonProps & React.RefAttributes<HTMLElement>) => {
   return (
     <BButton
       {...props}
-      className={`${className} ${props.accent ? 'ant-custom-btn-accent' : ''}`}
+      size={size}
+      className={`ant-custom ${className ? className : ''} ${
+        props.accent ? 'btn-accent' : ''
+      } ${size ? size : ''}`}
     >
       {props.children}
     </BButton>
@@ -24,16 +28,14 @@ const Button = ({
 }
 
 const BButton = styled(AButton)`
-  width: 100%;
-  padding: 1rem !important;
-  display: block;
-  font-size: 0.75rem;
   text-align: center;
-  margin-bottom: 30px;
-  border-radius: 0.5rem;
-  font-size: 16px;
   transition: all ease 0.5s;
   height: auto;
+
+  &.large {
+    padding: 1rem !important;
+    font-size: 16px;
+  }
 `
 
 export default Button

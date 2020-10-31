@@ -1,10 +1,10 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
 import React, {useContext, useEffect, useState, useCallback} from 'react'
-import {Link} from 'react-router-dom'
 import Spin from 'antd/es/spin'
 import Row from 'antd/es/row'
 import Col from 'antd/es/col'
+import ATitle from 'antd/es/typography/Title'
 import {DndProvider} from 'react-dnd'
 import {HTML5Backend} from 'react-dnd-html5-backend'
 import update from 'immutability-helper'
@@ -18,15 +18,21 @@ import Container from '../../components/Container'
 import {findLinksByOwner, reorderLinks} from '../../api/link.api'
 import LinkItem from './components/LinkItem'
 import Button from '../../components/Button'
+import LinkModal from './components/LinkModal'
 
 const Links = () => {
   const userContext = useContext(UserContext)
   const user = userContext as User
+
   const [loading, setLoading] = useState(true)
+  const [showModal, setShowModal] = useState(false)
   const [dirtyLinks, setDirtyLinks] = useState(false)
   const [allLinks, setAllLinks] = useState<LinkModel[]>([])
+  const [editLink, setEditLink] = useState<LinkModel | null>(null)
 
   const getLinks = async () => {
+    setLoading(true)
+
     const response = await findLinksByOwner(user._id)
 
     setAllLinks(response.data)
@@ -71,10 +77,22 @@ const Links = () => {
       <Container background={false} span={20}>
         <Title>Links</Title>
 
-        <Row css={{marginBottom: 30}}>
-          <Col xs={24} sm={24}>
-            <Button css={{marginBottom: 30}} block accent size="large">
-              <Link to="/link/new">New Link</Link>
+        <Row
+          justify="space-around"
+          align="middle"
+          css={
+            loading ? {display: 'block', marginBottom: 30} : {marginBottom: 30}
+          }
+        >
+          <Col xs={24} lg={10} xl={8}>
+            <Button
+              css={{marginBottom: 30}}
+              block
+              accent
+              size="large"
+              onClick={() => setShowModal(true)}
+            >
+              New Link
             </Button>
 
             {loading ? (
@@ -89,10 +107,23 @@ const Links = () => {
                     key={link._id}
                     link={link}
                     moveLink={moveLink}
+                    editLink={() => {
+                      setEditLink(link)
+                      setShowModal(true)
+                    }}
                   />
                 ))}
               </DndProvider>
             )}
+          </Col>
+
+          <Col xs={0} lg={14} xl={16}>
+            <ATitle
+              level={1}
+              css={{textAlign: 'center', color: '#a2bdd8 !important'}}
+            >
+              Preview Coming Soon
+            </ATitle>
           </Col>
         </Row>
       </Container>
@@ -102,6 +133,17 @@ const Links = () => {
           Save Order
         </SaveOrderButton>
       )}
+
+      <LinkModal
+        link={editLink}
+        nextOrder={allLinks.length}
+        visible={showModal}
+        onHide={() => {
+          setEditLink(null)
+          setShowModal(false)
+        }}
+        onSave={() => getLinks()}
+      />
     </div>
   )
 }
@@ -115,6 +157,7 @@ const SaveOrderButton = styled(Button)`
   height: auto;
   border-radius: 0 !important;
   margin-bottom: 0;
+  z-index: 1;
 `
 
 export default Links
