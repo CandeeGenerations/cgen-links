@@ -12,16 +12,10 @@ const Container = (props: ContainerProps) => {
   const background = props.background === undefined ? true : props.background
   const width = props.span || 12
   const offset = (24 - width) / 2
-  const colProps: ColProps = {
-    lg: {span: width, offset},
-    md: 24,
-    sm: 24,
-    xs: 24,
-  }
 
   return (
     <Row>
-      <Col {...colProps}>
+      <Col lg={24} xl={{span: width, offset}}>
         {background ? (
           <div
             style={{

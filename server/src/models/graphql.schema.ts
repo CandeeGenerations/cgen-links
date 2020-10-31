@@ -37,6 +37,7 @@ export class LinkInput {
     deleted: boolean;
     clicks?: LinkClicksRelation;
     owner?: LinkOwnerRelation;
+    order?: number;
 }
 
 export class LinkOwnerRelation {
@@ -106,6 +107,7 @@ export class ClickPage {
 export class Link {
     description?: string;
     _id: string;
+    order?: number;
     clicks: ClickPage;
     owner: User;
     title: string;

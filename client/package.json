@@ -7,6 +7,7 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@ant-design/icons": "^4.2.2",
+    "@craco/craco": "^5.7.0",
     "@emotion/core": "^10.0.35",
     "@emotion/styled": "^10.0.27",
     "@testing-library/jest-dom": "^4.2.4",
@@ -18,9 +19,13 @@
     "@types/react-dom": "^16.9.0",
     "antd": "^4.6.6",
     "axios": "^0.20.0",
+    "craco-less": "^1.17.0",
     "dayjs": "^1.9.1",
+    "immutability-helper": "^3.1.1",
     "react": "^16.13.1",
     "react-color": "^2.18.1",
+    "react-dnd": "^11.1.3",
+    "react-dnd-html5-backend": "^11.1.3",
     "react-dom": "^16.13.1",
     "react-google-login": "^5.1.21",
     "react-helmet": "^6.1.0",
@@ -30,10 +35,9 @@
     "typescript": "~3.7.2"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test"
   },
   "proxy": "http://127.0.0.1:3002/",
   "eslintConfig": {
@@ -53,6 +57,7 @@
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
+    "@types/immutability-helper": "^2.6.3",
     "@types/react-color": "^3.0.4",
     "@types/react-helmet": "^6.1.0",
     "@types/react-router-dom": "^5.1.5",

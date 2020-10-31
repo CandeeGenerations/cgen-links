@@ -4,6 +4,8 @@ import ReactDOM from 'react-dom'
 import App from './screens/App'
 import * as serviceWorker from './serviceWorker'
 
+import './content/antd.less'
+
 ReactDOM.render(
   <React.StrictMode>
     <App />

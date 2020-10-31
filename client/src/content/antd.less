@@ -1,0 +1,39 @@
+// https://github.com/ant-design/ant-design/blob/master/components/style/themes/default.less
+
+@import '~antd/dist/antd.less';
+
+@primary-color: #4762E6;
+@secondary-color: #E6F0FA;
+@accent-color: #45C7E1;
+
+@body-background: @secondary-color;
+@layout-body-background: @secondary-color;
+
+@btn-primary-bg: @accent-color;
+
+@btn-accent-bg: @primary-color;
+@btn-accent-color: @secondary-color;
+
+@border-radius-base: 4px;
+@border-radius-lg: 8px;
+
+.ant-custom {
+  &.ant-btn {
+    border-radius: @border-radius-lg;
+  }
+
+  &.btn-accent {
+    border: 0;
+    color: @btn-accent-color;
+    background-color: @btn-accent-bg;
+
+    &:hover, &:active, &:focus {
+      color: @btn-accent-color;
+      background-color: lighten(@btn-accent-bg, 10%);
+    }
+  }
+
+  &.border-sm {
+    border-radius: @border-radius-base;
+  }
+}

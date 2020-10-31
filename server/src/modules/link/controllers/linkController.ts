@@ -1,8 +1,8 @@
 import {Body, Controller, Get, Param, Post, Put, Query} from '@nestjs/common'
 
-import {asyncForEach} from 'src/helpers'
+import {asyncForEach, sortLinks} from 'src/helpers'
 import {LinkService} from '../services/link.service'
-import {LinkModel, LinkPageModel} from 'src/models/override.model'
+import {LinkModel, LinkPageModel, ReorderModel} from 'src/models/override.model'
 import {Link, LinkInput, LinkPage} from 'src/models/graphql.schema'
 import {ClickService} from 'src/modules/click/services/click.service'
 
@@ -29,9 +29,7 @@ export class LinkController {
       })
     })
 
-    const sortedLinks = links.sort(
-      (a, b) => Number(b.addedTs) - Number(a.addedTs),
-    )
+    const sortedLinks = links.sort(sortLinks)
 
     delete linksByOwner.data
 
@@ -46,9 +44,7 @@ export class LinkController {
     @Param('owner') owner: string,
   ): Promise<LinkPage> {
     const linksByOwner = await this.linkService.findActiveLinksByOwner(owner)
-    const sortedLinks = linksByOwner.data.sort(
-      (a, b) => Number(b.addedTs) - Number(a.addedTs),
-    )
+    const sortedLinks = linksByOwner.data.sort(sortLinks)
 
     delete linksByOwner.data
 
@@ -84,5 +80,25 @@ export class LinkController {
   @Post(':id/delete')
   softDeleteLink(@Param('id') id: string): Promise<Link> {
     return this.linkService.softDeleteLink(id)
+  }
+
+  @Post('reorder')
+  async reorderLinks(@Body() input: ReorderModel) {
+    for (let i = 0; i < input.ids.length; i++) {
+      const link = await this.linkService.findLinkById(input.ids[i])
+
+      await this.linkService.updateLink(link._id, {
+        deleted: link.deleted,
+        active: link.active,
+        destination: link.destination,
+        description: link.description,
+        addedTs: link.addedTs,
+        title: link.title,
+        order: i + 1,
+        owner: {
+          connect: link.owner._id,
+        },
+      })
+    }
   }
 }

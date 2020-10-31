@@ -58,6 +58,7 @@ type Link {
   description: String
   # The document's ID.
   _id: ID!
+  order: Int
   clicks(
     # The number of items to return per page.
     _size: Int
@@ -94,6 +95,7 @@ input LinkInput {
   deleted: Boolean!
   clicks: LinkClicksRelation
   owner: LinkOwnerRelation
+  order: Int
 }
 
 # Allow manipulating the relationship between the types 'Link' and 'User' using the field 'Link.owner'.

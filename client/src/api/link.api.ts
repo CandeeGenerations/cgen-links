@@ -60,3 +60,15 @@ export const deleteLink = async (id: string): Promise<Link> => {
 
   return handleErrors(response)
 }
+
+export const reorderLinks = async (
+  ids: string[],
+  owner: string,
+): Promise<LinkPageModel> => {
+  const response = await post<LinkPageModel>({
+    url: 'link/reorder',
+    data: {ids, owner},
+  })
+
+  return handleErrors(response)
+}

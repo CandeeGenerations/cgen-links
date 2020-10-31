@@ -25,6 +25,7 @@ const FRAGMENTS = {
       addedTs
       active
       deleted
+      order
     }
   `,
 

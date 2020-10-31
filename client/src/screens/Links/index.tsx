@@ -1,89 +1,38 @@
-import React, {useContext, useEffect, useState} from 'react'
-import Space from 'antd/es/space'
-import {Link} from 'react-router-dom'
-import Tooltip from 'antd/es/tooltip'
-import Skeleton from 'antd/es/skeleton'
-import Text from 'antd/es/typography/Text'
-import Breadcrumb from 'antd/es/breadcrumb'
-import Table, {ColumnsType} from 'antd/es/table'
+/** @jsx jsx */
+import {jsx} from '@emotion/core'
+import React, {useContext, useEffect, useState, useCallback} from 'react'
+import Spin from 'antd/es/spin'
+import Row from 'antd/es/row'
+import Col from 'antd/es/col'
+import ATitle from 'antd/es/typography/Title'
+import {DndProvider} from 'react-dnd'
+import {HTML5Backend} from 'react-dnd-html5-backend'
+import update from 'immutability-helper'
+import styled from '@emotion/styled'
 
 import {User} from '../../models'
 import {UserContext} from '../App'
-import {formatDate} from '../../helpers'
 import Title from '../../components/Title'
 import {LinkModel} from '../../models/link.model'
 import Container from '../../components/Container'
-import {findLinksByOwner} from '../../api/link.api'
-import NullableField from '../../components/NullableField'
+import {findLinksByOwner, reorderLinks} from '../../api/link.api'
+import LinkItem from './components/LinkItem'
+import Button from '../../components/Button'
+import LinkModal from './components/LinkModal'
 
 const Links = () => {
   const userContext = useContext(UserContext)
   const user = userContext as User
-  const [loading, setLoading] = useState(true)
-  const [allLinks, setAllLinks] = useState<LinkModel[]>([])
 
-  const columns: ColumnsType<LinkModel> = [
-    {
-      title: 'Title',
-      dataIndex: 'title',
-      key: 'title',
-    },
-    {
-      title: 'Destination',
-      dataIndex: 'destination',
-      key: 'destination',
-      responsive: ['xl'],
-      render: (url: string) => (
-        <Text code copyable>
-          {url}
-        </Text>
-      ),
-    },
-    {
-      title: 'Description',
-      key: 'description',
-      dataIndex: 'description',
-      ellipsis: {
-        showTitle: false,
-      },
-      render: (description: string) => (
-        <NullableField
-          value={
-            description && (
-              <Tooltip placement="topLeft" title={description}>
-                {description}
-              </Tooltip>
-            )
-          }
-        />
-      ),
-    },
-    {
-      title: 'Clicks',
-      dataIndex: 'clickCount',
-      key: 'clickCount',
-      align: 'center',
-      render: (clickCount?: number) => clickCount || 0,
-    },
-    {
-      title: 'Added Date',
-      dataIndex: 'addedTs',
-      key: 'addedTs',
-      responsive: ['xl'],
-      render: formatDate,
-    },
-    {
-      title: 'Action',
-      key: 'action',
-      render: (text: string, record: LinkModel) => (
-        <Space size="middle">
-          <Link to={`/links/${record._id}`}>View Details</Link>
-        </Space>
-      ),
-    },
-  ]
+  const [loading, setLoading] = useState(true)
+  const [showModal, setShowModal] = useState(false)
+  const [dirtyLinks, setDirtyLinks] = useState(false)
+  const [allLinks, setAllLinks] = useState<LinkModel[]>([])
+  const [editLink, setEditLink] = useState<LinkModel | null>(null)
 
   const getLinks = async () => {
+    setLoading(true)
+
     const response = await findLinksByOwner(user._id)
 
     setAllLinks(response.data)
@@ -94,25 +43,121 @@ const Links = () => {
     getLinks()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+  const saveOrder = async () => {
+    setDirtyLinks(false)
+    setLoading(true)
+
+    await reorderLinks(
+      allLinks.map(x => x._id),
+      user._id,
+    )
+
+    setLoading(false)
+  }
+
+  const moveLink = useCallback(
+    async (dragIndex: number, hoverIndex: number) => {
+      const dragCard = allLinks[dragIndex]
+
+      setAllLinks(
+        update(allLinks, {
+          $splice: [
+            [dragIndex, 1],
+            [hoverIndex, 0, dragCard],
+          ],
+        }),
+      )
+      setDirtyLinks(true)
+    },
+    [allLinks],
+  )
+
   return (
-    <>
-      <Container span={20} background={false}>
-        <Breadcrumb style={{margin: '16px 0'}}>
-          <Breadcrumb.Item>Links</Breadcrumb.Item>
-        </Breadcrumb>
+    <div css={{padding: '50px 0'}}>
+      <Container background={false} span={20}>
+        <Title>Links</Title>
+
+        <Row
+          justify="space-around"
+          align="middle"
+          css={
+            loading ? {display: 'block', marginBottom: 30} : {marginBottom: 30}
+          }
+        >
+          <Col xs={24} lg={10} xl={8}>
+            <Button
+              css={{marginBottom: 30}}
+              block
+              accent
+              size="large"
+              onClick={() => setShowModal(true)}
+            >
+              New Link
+            </Button>
+
+            {loading ? (
+              <div css={{textAlign: 'center', marginTop: 30}}>
+                <Spin />
+              </div>
+            ) : (
+              <DndProvider backend={HTML5Backend}>
+                {allLinks.map((link, index) => (
+                  <LinkItem
+                    index={index}
+                    key={link._id}
+                    link={link}
+                    moveLink={moveLink}
+                    editLink={() => {
+                      setEditLink(link)
+                      setShowModal(true)
+                    }}
+                  />
+                ))}
+              </DndProvider>
+            )}
+          </Col>
+
+          <Col xs={0} lg={14} xl={16}>
+            <ATitle
+              level={1}
+              css={{textAlign: 'center', color: '#a2bdd8 !important'}}
+            >
+              Preview Coming Soon
+            </ATitle>
+          </Col>
+        </Row>
       </Container>
 
-      <Container span={20}>
-        <Title link={{title: 'New Link', to: '/links/new'}}>Links</Title>
+      {dirtyLinks && (
+        <SaveOrderButton block size="large" accent onClick={saveOrder}>
+          Save Order
+        </SaveOrderButton>
+      )}
 
-        {loading ? (
-          <Skeleton active />
-        ) : (
-          <Table dataSource={allLinks} columns={columns} />
-        )}
-      </Container>
-    </>
+      <LinkModal
+        link={editLink}
+        nextOrder={allLinks.length}
+        visible={showModal}
+        onHide={() => {
+          setEditLink(null)
+          setShowModal(false)
+        }}
+        onSave={() => getLinks()}
+      />
+    </div>
   )
 }
+
+const SaveOrderButton = styled(Button)`
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px 0;
+  height: auto;
+  border-radius: 0 !important;
+  margin-bottom: 0;
+  z-index: 1;
+`
 
 export default Links

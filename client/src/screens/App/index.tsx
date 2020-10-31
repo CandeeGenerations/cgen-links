@@ -1,20 +1,15 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
-import Menu from 'antd/es/menu'
 import Spin from 'antd/es/spin'
 import Layout from 'antd/es/layout'
-import ALink from 'antd/es/typography/Link'
 import React, {useEffect, useState} from 'react'
 import {
   Switch,
   Route,
-  Link as RLink,
   BrowserRouter,
   Redirect,
   useHistory,
 } from 'react-router-dom'
-
-import './app.css'
 
 import Home from '../Home'
 import Links from '../Links'
@@ -24,11 +19,11 @@ import Settings from '../Settings'
 import LinkPage from '../LinkPage'
 import {getConfig} from '../../api'
 import {authTokenKey} from '../../helpers'
-import NewEditLink from '../Links/NewEditLink'
 import {ConfigModel} from '../../models/config.model'
 import Copyright from '../../components/Copyright'
+import Navbar from '../../components/Navbar'
 
-const {Header, Content} = Layout
+const {Content} = Layout
 
 export const UserContext = React.createContext<User | null>(null)
 export const ConfigContext = React.createContext<ConfigModel | null>(null)
@@ -69,30 +64,14 @@ const App = () => {
   }
 
   const redirect = (Component: any): JSX.Element => (
-    <Layout style={{minWidth: 470}}>
-      {user && (
-        <Header>
-          <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['1']}>
-            <Menu.Item key="1">
-              <RLink to="/links">Links</RLink>
-            </Menu.Item>
-
-            <Menu.Item key="2">
-              <RLink to="/settings">Settings</RLink>
-            </Menu.Item>
-
-            <Menu.Item key="3" style={{float: 'right'}}>
-              <ALink onClick={onLogOut}>Log Out</ALink>
-            </Menu.Item>
-          </Menu>
-        </Header>
-      )}
+    <Layout>
+      {user && <Navbar onLogOut={onLogOut} />}
 
       <Content style={{padding: user ? '0 50px' : '50px 50px 0'}}>
         {user ? <Component /> : <Redirect to={{pathname: '/'}} />}
       </Content>
 
-      <Copyright />
+      <Copyright onLogOut={onLogOut} />
     </Layout>
   )
 
@@ -105,11 +84,6 @@ const App = () => {
       <UserContext.Provider value={user}>
         <BrowserRouter>
           <Switch>
-            <Route
-              path={['/links/new', '/links/edit/:id']}
-              render={() => redirect(NewEditLink)}
-            />
-
             <Route path="/links/:id" render={() => redirect(Link)} />
 
             <Route path="/links" render={() => redirect(Links)} />
