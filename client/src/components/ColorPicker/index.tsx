@@ -3,7 +3,6 @@ import {jsx} from '@emotion/core'
 import styled from '@emotion/styled'
 import React, {useState} from 'react'
 import {SketchPicker} from 'react-color'
-import Button from 'antd/es/button'
 
 export interface ColorPickerProps {
   defaultValue?: string

@@ -22,10 +22,14 @@ import {authTokenKey} from '../../helpers'
 import {ConfigModel} from '../../models/config.model'
 import Copyright from '../../components/Copyright'
 import Navbar from '../../components/Navbar'
+import {findUserById} from '../../api/auth.api'
 
 const {Content} = Layout
 
-export const UserContext = React.createContext<User | null>(null)
+export const UserContext = React.createContext<{
+  user: User | null
+  getUser: () => void
+} | null>(null)
 export const ConfigContext = React.createContext<ConfigModel | null>(null)
 
 const App = () => {
@@ -42,10 +46,17 @@ const App = () => {
     setLoading(false)
   }
 
-  const getUser = () => {
+  const getUser = async () => {
     const userData = localStorage.getItem(authTokenKey)
 
-    setUser(userData && JSON.parse(atob(userData as string)))
+    if (userData) {
+      const userObject = (userData &&
+        JSON.parse(atob(userData as string))) as User
+
+      const user = await findUserById(userObject._id)
+
+      setUser(user)
+    }
   }
 
   useEffect(() => {
@@ -81,7 +92,7 @@ const App = () => {
     </div>
   ) : (
     <ConfigContext.Provider value={config}>
-      <UserContext.Provider value={user}>
+      <UserContext.Provider value={{user, getUser}}>
         <BrowserRouter>
           <Switch>
             <Route path="/links/:id" render={() => redirect(Link)} />

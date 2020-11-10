@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import Row from 'antd/es/row'
 import Col from 'antd/es/col'
 import Tooltip from 'antd/es/tooltip'
@@ -6,15 +6,16 @@ import Skeleton from 'antd/es/skeleton'
 import Text from 'antd/es/typography/Text'
 import Breadcrumb from 'antd/es/breadcrumb'
 import Table, {ColumnsType} from 'antd/es/table'
-import {useParams, Link as RLink} from 'react-router-dom'
+import {useParams, Link as RLink, Redirect} from 'react-router-dom'
 
 import {formatDate} from '../../helpers'
 import Title from '../../components/Title'
 import {findLinkById} from '../../api/link.api'
-import {Click, Link as MLink} from '../../models'
+import {Click, Link as MLink, User} from '../../models'
 import Container from '../../components/Container'
 import {findAllClicksByOwner} from '../../api/click.api'
 import NullableField from '../../components/NullableField'
+import {UserContext} from '../App'
 
 const columns: ColumnsType<Click> = [
   {
@@ -65,6 +66,8 @@ const columns: ColumnsType<Click> = [
 
 const Link = () => {
   const {id} = useParams<{id: string}>()
+  const userContext = useContext(UserContext)
+  const user = userContext?.user as User
 
   const [loadingLink, setLoadingLink] = useState(true)
   const [clicks, setClicks] = useState<Click[]>([])
@@ -90,7 +93,9 @@ const Link = () => {
     getClicks()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  return (
+  return user && (!user.settings || !user.settings.slug) ? (
+    <Redirect to={{pathname: '/settings'}} />
+  ) : (
     <>
       <Container span={20} background={false}>
         <Breadcrumb style={{margin: '16px 0'}}>

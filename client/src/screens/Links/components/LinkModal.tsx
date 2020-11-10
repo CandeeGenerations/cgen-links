@@ -23,7 +23,7 @@ export interface LinkModalProps {
 
 const LinkModal = (props: LinkModalProps) => {
   const userContext = useContext(UserContext)
-  const user = userContext as User
+  const user = userContext?.user as User
 
   const [form] = Form.useForm()
 
