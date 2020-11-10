@@ -1,6 +1,7 @@
-import React from 'react'
+/** @jsx jsx */
+import {jsx} from '@emotion/core'
 import Row from 'antd/es/row'
-import Col, {ColProps} from 'antd/es/col'
+import Col from 'antd/es/col'
 
 export interface ContainerProps {
   background?: boolean
@@ -14,24 +15,26 @@ const Container = (props: ContainerProps) => {
   const offset = (24 - width) / 2
 
   return (
-    <Row>
-      <Col lg={24} xl={{span: width, offset}}>
-        {background ? (
-          <div
-            style={{
-              padding: 48,
-              minHeight: 280,
-              margin: '16px 0',
-              background: '#fff',
-            }}
-          >
-            {props.children}
-          </div>
-        ) : (
-          props.children
-        )}
-      </Col>
-    </Row>
+    <div css={{padding: 20}}>
+      <Row>
+        <Col xs={24} xl={{span: width, offset}}>
+          {background ? (
+            <div
+              css={{
+                padding: '50px 50px 25px',
+                backgroundColor: '#fff',
+                borderRadius: '0.5rem',
+                boxShadow: '0 0 30px #bcbcbc',
+              }}
+            >
+              {props.children}
+            </div>
+          ) : (
+            props.children
+          )}
+        </Col>
+      </Row>
+    </div>
   )
 }
 

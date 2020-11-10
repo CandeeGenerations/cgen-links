@@ -20,7 +20,12 @@ const Copyright = (props: CopyrightProps) => {
         )}
 
         <Col xs={24}>
-          <a href="https://cgen.cc" target="_blank" css={{color: '#a2bdd8'}}>
+          <a
+            href="https://cgen.cc"
+            target="_blank"
+            rel="noopener noreferrer"
+            css={{color: '#a2bdd8'}}
+          >
             Candee Generations
           </a>{' '}
           &copy; {new Date().getFullYear()}

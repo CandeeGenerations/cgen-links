@@ -1,10 +1,13 @@
+/** @jsx jsx */
+import {jsx} from '@emotion/core'
+import styled from '@emotion/styled'
 import React, {useContext, useEffect, useState} from 'react'
+import Grid from 'antd/es/grid'
 import Row from 'antd/es/row'
 import Col from 'antd/es/col'
 import Form from 'antd/es/form'
 import Alert from 'antd/es/alert'
 import Input from 'antd/es/input'
-import Button from 'antd/es/button'
 import Skeleton from 'antd/es/skeleton'
 import Checkbox from 'antd/es/checkbox'
 import Typography from 'antd/es/typography'
@@ -17,12 +20,16 @@ import {findUserById} from '../../api/auth.api'
 import Container from '../../components/Container'
 import ColorPicker from '../../components/ColorPicker'
 import {createSettings, updateSettings} from '../../api/settings.api'
+import Button from '../../components/Button'
+
+const {useBreakpoint} = Grid
 
 const Settings = () => {
   const userContext = useContext(UserContext)
   const user = userContext as User
 
   const [form] = Form.useForm()
+  const screens = useBreakpoint()
 
   const [error, setError] = useState('')
   const [saved, setSaved] = useState(false)
@@ -87,7 +94,7 @@ const Settings = () => {
       {settingsLoading ? (
         <Skeleton active />
       ) : (
-        <>
+        <React.Fragment>
           {saved && (
             <Alert
               message="Success"
@@ -109,17 +116,17 @@ const Settings = () => {
           )}
 
           <Form form={form} layout="vertical" name="basic" onFinish={onFinish}>
-            <Row gutter={[16, {md: 16, sm: 24, xs: 24}]}>
-              <Col md={12} sm={24} xs={24}>
-                <Form.Item
-                  label="Slug"
+            <Row gutter={[16, {md: 16, xs: 24}]}>
+              <Col xs={24} lg={12}>
+                <FormItem
+                  label={`Slug${screens.md ? '' : ' (https://links.cgen.cc/)'}`}
                   name="slug"
                   rules={[
                     {required: true, message: 'Please include your slug'},
                   ]}
                 >
                   <Input addonBefore="https://links.cgen.cc/" />
-                </Form.Item>
+                </FormItem>
 
                 <Form.Item
                   label="Logo URL"
@@ -140,14 +147,14 @@ const Settings = () => {
                   <Checkbox>Use Gradient</Checkbox>
                 </Form.Item>
 
-                <Row gutter={[16, {md: 16, sm: 24, xs: 24}]}>
-                  <Col md={12} sm={24} xs={24}>
+                <Row gutter={[16, {md: 16, xs: 24}]}>
+                  <Col xs={24} md={12}>
                     <Form.Item label="Primary Color" name="primaryColor">
                       <ColorPicker defaultValue="#000" />
                     </Form.Item>
                   </Col>
 
-                  <Col md={12} sm={24} xs={24}>
+                  <Col xs={24} md={12}>
                     <Form.Item label="Secondary Color" name="secondaryColor">
                       <ColorPicker defaultValue="#fff" />
                     </Form.Item>
@@ -155,37 +162,75 @@ const Settings = () => {
                 </Row>
               </Col>
 
-              <Col md={12} sm={24} xs={24}>
+              <Col xs={24} lg={12}>
                 <Typography.Title level={4}>Social</Typography.Title>
 
-                <Form.Item label="Facebook" name="facebook">
+                <FormItem
+                  label={`Facebook${
+                    screens.md ? '' : ' (https://facebook.com/)'
+                  }`}
+                  name="facebook"
+                >
                   <Input addonBefore="https://facebook.com/" />
-                </Form.Item>
+                </FormItem>
 
-                <Form.Item label="Instagram" name="instagram">
+                <FormItem
+                  label={`Instagram${
+                    screens.md ? '' : ' (https://instagram.com/)'
+                  }`}
+                  name="instagram"
+                >
                   <Input addonBefore="https://instagram.com/" />
-                </Form.Item>
+                </FormItem>
 
-                <Form.Item label="Twitter" name="twitter">
+                <FormItem
+                  label={`Twitter${
+                    screens.md ? '' : ' (https://twitter.com/)'
+                  }`}
+                  name="twitter"
+                >
                   <Input addonBefore="https://twitter.com/" />
-                </Form.Item>
+                </FormItem>
 
-                <Form.Item label="YouTube" name="youtube">
-                  <Input addonBefore="https://youtube.com/channel/" />
-                </Form.Item>
+                <FormItem
+                  label={`YouTube${
+                    screens.md ? '' : ' (https://youtube.com/)'
+                  }`}
+                  name="youtube"
+                >
+                  <Input addonBefore="https://youtube.com/" />
+                </FormItem>
               </Col>
             </Row>
 
-            <Form.Item>
-              <Button type="primary" htmlType="submit" loading={loading}>
-                Save
-              </Button>
-            </Form.Item>
+            <Row>
+              <Col xs={24} lg={10} offset={screens.lg ? 7 : 0}>
+                <Form.Item>
+                  <Button
+                    block
+                    accent
+                    size="large"
+                    htmlType="submit"
+                    loading={loading}
+                  >
+                    Save
+                  </Button>
+                </Form.Item>
+              </Col>
+            </Row>
           </Form>
-        </>
+        </React.Fragment>
       )}
     </Container>
   )
 }
+
+const FormItem = styled(Form.Item)`
+  .ant-input-group-addon {
+    @media (max-width: 769px) {
+      display: none;
+    }
+  }
+`
 
 export default Settings
