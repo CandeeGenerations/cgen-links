@@ -1,14 +1,13 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
-import React, {useContext, useEffect, useState, useCallback} from 'react'
+import {useContext, useEffect, useState} from 'react'
 import Spin from 'antd/es/spin'
 import Row from 'antd/es/row'
 import Col from 'antd/es/col'
 import ATitle from 'antd/es/typography/Title'
-import {DndProvider} from 'react-dnd'
-import {HTML5Backend} from 'react-dnd-html5-backend'
-import update from 'immutability-helper'
 import styled from '@emotion/styled'
+import {DragDropContext, Droppable, DropResult} from 'react-beautiful-dnd'
+import update from 'immutability-helper'
 
 import {User} from '../../models'
 import {UserContext} from '../App'
@@ -55,35 +54,32 @@ const Links = () => {
     setLoading(false)
   }
 
-  const moveLink = useCallback(
-    async (dragIndex: number, hoverIndex: number) => {
-      const dragCard = allLinks[dragIndex]
+  const onDragEnd = (result: DropResult) => {
+    const {destination, source} = result
 
-      setAllLinks(
-        update(allLinks, {
-          $splice: [
-            [dragIndex, 1],
-            [hoverIndex, 0, dragCard],
-          ],
-        }),
-      )
-      setDirtyLinks(true)
-    },
-    [allLinks],
-  )
+    if (!destination || destination.index === source.index) {
+      return
+    }
+
+    const dragCard = allLinks[source.index]
+
+    setAllLinks(
+      update(allLinks, {
+        $splice: [
+          [source.index, 1],
+          [destination.index, 0, dragCard],
+        ],
+      }),
+    )
+    setDirtyLinks(true)
+  }
 
   return (
     <div css={{padding: '50px 0'}}>
       <Container background={false} span={20}>
         <Title>Links</Title>
 
-        <Row
-          justify="space-around"
-          align="middle"
-          css={
-            loading ? {display: 'block', marginBottom: 30} : {marginBottom: 30}
-          }
-        >
+        <Row justify="space-around" align="middle" css={{marginBottom: 30}}>
           <Col xs={24} lg={10} xl={8}>
             <Button
               css={{marginBottom: 30}}
@@ -100,20 +96,26 @@ const Links = () => {
                 <Spin />
               </div>
             ) : (
-              <DndProvider backend={HTML5Backend}>
-                {allLinks.map((link, index) => (
-                  <LinkItem
-                    index={index}
-                    key={link._id}
-                    link={link}
-                    moveLink={moveLink}
-                    editLink={() => {
-                      setEditLink(link)
-                      setShowModal(true)
-                    }}
-                  />
-                ))}
-              </DndProvider>
+              <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable droppableId="links">
+                  {provided => (
+                    <div ref={provided.innerRef} {...provided.droppableProps}>
+                      {allLinks.map((link, index) => (
+                        <LinkItem
+                          index={index}
+                          key={link._id}
+                          link={link}
+                          editLink={() => {
+                            setEditLink(link)
+                            setShowModal(true)
+                          }}
+                        />
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
             )}
           </Col>
 

@@ -10,7 +10,6 @@ import {useLocation} from 'react-router-dom'
 import Title from 'antd/es/typography/Title'
 import React, {useEffect, useState} from 'react'
 
-import {hexToRgba} from '../../helpers'
 import {Link, Settings} from '../../models'
 import LinkButton from './components/LinkButton'
 import SocialIcon from './components/SocialIcon'

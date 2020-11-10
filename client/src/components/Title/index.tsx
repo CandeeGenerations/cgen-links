@@ -1,10 +1,10 @@
 import React from 'react'
 import Button from 'antd/es/button'
 import {Link} from 'react-router-dom'
-import ATitle from 'antd/es/typography/Title'
+import ATitle, {TitleProps as ATitleProps} from 'antd/es/typography/Title'
 import styled from '@emotion/styled'
 
-export interface TitleProps {
+export interface TitleProps extends ATitleProps {
   link?: {
     title: string
     to: string
@@ -12,16 +12,16 @@ export interface TitleProps {
   children: React.ReactNode | string
 }
 
-const Title = (props: TitleProps) => {
+const Title = ({link, children, ...props}: TitleProps) => {
   return (
     <>
-      {props.link && (
+      {link && (
         <Button type="primary" style={{float: 'right', marginTop: 7}}>
-          <Link to={props.link.to}>{props.link.title}</Link>
+          <Link to={link.to}>{link.title}</Link>
         </Button>
       )}
 
-      <BTitle>{props.children}</BTitle>
+      <BTitle {...props}>{children}</BTitle>
     </>
   )
 }

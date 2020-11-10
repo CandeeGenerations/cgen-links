@@ -4,7 +4,7 @@ import Modal from 'antd/es/modal'
 import Alert from 'antd/es/alert'
 import Form from 'antd/es/form'
 import Input from 'antd/es/input'
-import React, {useContext, useState, useEffect} from 'react'
+import {useContext, useState, useEffect} from 'react'
 
 import {LinkInput, User} from '../../../models'
 import Button from '../../../components/Button'
@@ -36,7 +36,7 @@ const LinkModal = (props: LinkModalProps) => {
     if (props.link) {
       form.setFieldsValue({...props.link})
     }
-  }, [props.link])
+  }, [props.link]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSave = async (values: LinkInput) => {
     setLoading(true)

@@ -35,7 +35,7 @@ const Login = (props: LoginProps) => {
 
   return (
     <>
-      <Title>Login Here</Title>
+      <Title style={{textAlign: 'center'}}>Links Login</Title>
 
       {error && (
         <Alert
