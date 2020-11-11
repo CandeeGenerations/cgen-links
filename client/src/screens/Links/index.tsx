@@ -8,6 +8,7 @@ import ATitle from 'antd/es/typography/Title'
 import styled from '@emotion/styled'
 import {DragDropContext, Droppable, DropResult} from 'react-beautiful-dnd'
 import update from 'immutability-helper'
+import {Redirect} from 'react-router-dom'
 
 import {User} from '../../models'
 import {UserContext} from '../App'
@@ -21,7 +22,7 @@ import LinkModal from './components/LinkModal'
 
 const Links = () => {
   const userContext = useContext(UserContext)
-  const user = userContext as User
+  const user = userContext?.user as User
 
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -74,7 +75,9 @@ const Links = () => {
     setDirtyLinks(true)
   }
 
-  return (
+  return user && (!user.settings || !user.settings.slug) ? (
+    <Redirect to={{pathname: '/settings'}} />
+  ) : (
     <div css={{padding: '50px 0'}}>
       <Container background={false} span={20}>
         <Title>Links</Title>

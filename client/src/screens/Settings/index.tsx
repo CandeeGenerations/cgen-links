@@ -26,7 +26,7 @@ const {useBreakpoint} = Grid
 
 const Settings = () => {
   const userContext = useContext(UserContext)
-  const user = userContext as User
+  const user = userContext?.user as User
 
   const [form] = Form.useForm()
   const screens = useBreakpoint()
@@ -43,6 +43,12 @@ const Settings = () => {
     if (response.settings) {
       setSettingsId(response.settings._id)
       form.setFieldsValue({...response.settings})
+    }
+
+    if (!response.settings || !response.settings.slug) {
+      setError(
+        'A Slug is required to use this app. Please add a slug for your profile here.',
+      )
     }
 
     setSettingsLoading(false)
@@ -75,6 +81,7 @@ const Settings = () => {
         setSettingsId(response._id)
       }
 
+      userContext?.getUser()
       setSaved(true)
     } catch (error) {
       setError(error.message)
