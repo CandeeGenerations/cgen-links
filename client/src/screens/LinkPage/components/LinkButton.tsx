@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
 import styled from '@emotion/styled'
-import {useContext, useState} from 'react'
+import {useContext} from 'react'
 
 import {ConfigContext} from '../../App'
 import {LinkPageContext} from '../index'
@@ -21,12 +21,8 @@ const LinkButton = (props: LinkButtonProps) => {
   } = useContext(LinkPageContext)
   const configContext = useContext(ConfigContext)
 
-  const [loading, setLoading] = useState(false)
-
   const handleClick = async () => {
     window.open(props.link.destination, '_target')
-
-    setLoading(true)
 
     const clickData: ClickInput = {
       userAgent: navigator.userAgent,
@@ -55,14 +51,11 @@ const LinkButton = (props: LinkButtonProps) => {
     } else {
       await createClick(clickData)
     }
-
-    setLoading(false)
   }
 
   return (
     <Button
       onClick={handleClick}
-      loading={loading}
       css={{
         color: `${button.textColor} !important`,
         backgroundColor: button.backgroundColor,
